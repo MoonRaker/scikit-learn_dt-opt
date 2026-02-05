@@ -2278,11 +2278,13 @@ struct __pyx_obj_7sklearn_4tree_9_splitter_Splitter {
   __Pyx_memviewslice monotonic_cst;
   int with_monotonic_cst;
   __Pyx_memviewslice sample_weight;
+  int new_version_flag;
   struct __pyx_t_7sklearn_4tree_5_tree_Node *node;
   struct __pyx_t_7sklearn_4tree_5_tree_Node *nodes;
+  __Pyx_memviewslice initial_cost;
   __Pyx_memviewslice sensor_cost;
-  __pyx_t_7sklearn_5utils_9_typedefs_float64_t time_cost;
-  __pyx_t_7sklearn_5utils_9_typedefs_float64_t depth_cost;
+  __Pyx_memviewslice depth_cost;
+  __Pyx_memviewslice measurement_cost;
   __pyx_t_7sklearn_5utils_9_typedefs_float64_t cost_threshold;
   __pyx_t_7sklearn_5utils_9_typedefs_float64_t imp_threshold;
   __pyx_t_7sklearn_5utils_9_typedefs_float64_t current_cost;

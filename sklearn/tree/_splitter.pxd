@@ -70,11 +70,14 @@ cdef class Splitter:
     cdef bint with_monotonic_cst
     cdef const float64_t[:] sample_weight
 
+    cdef bint new_version_flag
+
     cdef Node* node
     cdef Node* nodes
-    cdef float64_t[:] sensor_cost 
-    cdef float64_t time_cost
-    cdef float64_t depth_cost
+    cdef float64_t[:] initial_cost
+    cdef float64_t[:] sensor_cost
+    cdef float64_t[:] depth_cost
+    cdef float64_t[:] measurement_cost
     cdef float64_t cost_threshold
     cdef float64_t imp_threshold
     cdef float64_t current_cost
@@ -135,9 +138,9 @@ cdef class Splitter:
         float64_t lower_bound,
         float64_t upper_bound,
         Tree tree,
-        int32_t[:] sensor_types,
-        int32_t[:] depth_types,
-        int32_t[:] time_types,        
+        intp_t[:] sensor_types,
+        intp_t[:] depth_types,
+        intp_t[:] time_types,        
     ) except -1 nogil
 
     cdef void node_value(self, float64_t* dest) noexcept nogil

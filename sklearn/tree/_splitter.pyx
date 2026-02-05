@@ -55,43 +55,44 @@ TREE_UNDEFINED = -2
 cdef intp_t _TREE_LEAF = TREE_LEAF
 cdef intp_t _TREE_UNDEFINED = TREE_UNDEFINED
 
-# cdef extern from "stdio.h":
-#     FILE *fopen(const char *filename, const char *mode)
-#     int fprintf(FILE *stream, const char *format, ...)
-#     int fclose(FILE *stream)
-
-# cdef FILE *file = fopen("log.txt", "w")
-# with nogil:
-#     fprintf(file, "Logging from nogil\n")
-# fclose(file)
 
 cdef void copy_splitrecord(const SplitRecord* src, SplitRecord* dst) noexcept nogil:
     memcpy(dst, src, sizeof(SplitRecord))
 
-# cdef void copy_splitrecord(const SplitRecord* src, SplitRecord* dst) noexcept nogil:
-#     dst.feature = src.feature
-#     dst.pos = src.pos
-#     dst.threshold = src.threshold
-#     dst.improvement = src.improvement
-#     dst.impurity_left = src.impurity_left
-#     dst.impurity_right = src.impurity_right
-#     dst.lower_bound = src.lower_bound
-#     dst.upper_bound = src.upper_bound
-#     dst.missing_go_to_left = src.missing_go_to_left
-#     dst.n_missing = src.n_missing
-#     dst.cost = src.cost
 
-# cdef inline float64_t abs_float(float64_t x) noexcept nogil:
-#     if x < 0:
-#         return -x
-#     else:
-#         return x
+# cdef inline bint check_val(vector[intp_t] arr, intp_t val) noexcept nogil:
+#     cdef int i
+#     cdef int rows = arr.size()
+#     cdef bint add_flag
+    
+#     add_flag = True
+#     for i in range(rows):
+#         if arr[i] == val:
+#             add_flag = False
+#             break
+
+#     return add_flag
+
+
+# cdef inline void get_set(vector[intp_t] arr, vector[intp_t] &arr_set) noexcept nogil:
+#     cdef vector[intp_t] arr_set
+#     cdef int rows = arr.size()
+#     cdef int rows_set = arr_set.size()
+#     cdef int i,j
+#     cdef bint add_flag
+
+#     for i in range(rows):
+#         add_flag = check_val(arr_set, arr[i])
+#         if add_flag:    
+#             arr_set.push_back(arr[i])
+
 
 cdef inline void _add_to_split_list(
     SplitRecord rec,
     vector[SplitRecord] &split_list) noexcept nogil:
     """Adds record `rec` to the priority queue `split_list`."""
     split_list.push_back(rec)
+
 
 cdef inline int find_max_in_2d_array(vector[vector[float64_t]]  arr, int col) noexcept nogil:
     cdef int rows = arr.size()
@@ -110,6 +111,7 @@ cdef inline int find_max_in_2d_array(vector[vector[float64_t]]  arr, int col) no
 
     return max_ind
 
+
 cdef inline int find_min_in_2d_array(vector[vector[float64_t]]  arr, int col) noexcept nogil:
     cdef int rows = arr.size()
     # cdef int col = 0
@@ -127,49 +129,6 @@ cdef inline int find_min_in_2d_array(vector[vector[float64_t]]  arr, int col) no
 
     return min_ind
 
-# cdef inline int compare_rows(vector[float64_t] row1, vector[float64_t] row2, int col1, int col2) noexcept nogil:
-#     if row1[col1] > row2[col1]:
-#         return -1
-#     elif row1[col1] < row2[col1]:
-#         return 1
-#     elif row1[col2] > row2[col2]:
-#         return -1
-#     elif row1[col2] < row2[col2]:
-#         return 1
-#     return 0
-
-# cdef class Compare:
-#     cdef int col1
-#     cdef int col2
-
-#     def __init__(self, int col1, int col2):
-#         self.col1 = col1
-#         self.col2 = col2
-
-#     cdef int operator()(const vector[float64_t] &row1, const vector[float64_t] &row2) noexcept nogil:
-#         """
-#         Compare two rows by col1 and col2 in descending order.
-#         """
-#         cdef float64_t value1_col1 = row1[self.col1]
-#         cdef float64_t value2_col1 = row2[self.col1]
-#         cdef float64_t value1_col2 = row1[self.col2]
-#         cdef float64_t value2_col2 = row2[self.col2]
-#         # Compare col1
-#         if value1_col1 > value2_col1:
-#             return -1
-#         elif value1_col1 < value2_col1:
-#             return 1
-#         # Compare col2 if col1 is equal
-#         if value1_col2 > value2_col2:
-#             return -1
-#         elif value1_col2 < value2_col2:
-#             return 1
-#         return 0     
-
-# cdef inline void inplace_sort_2d_array_by_two_columns(vector[vector[float64_t]] &arr, int col1, int col2) noexcept nogil:
-#     cdef Compare cmp = Compare(col1, col2)
-#     sort_c(arr.begin(), arr.end(), cmp)
-    # sort_c(arr.begin(), arr.end(), lambda row1, row2: compare_rows(row1, row2, col1, col2))
 
 cdef inline void inplace_sort_2d_array_by_two_columns(vector[vector[float64_t]] &arr, \
     int col1, int col2) noexcept nogil:
@@ -189,6 +148,7 @@ cdef inline void inplace_sort_2d_array_by_two_columns(vector[vector[float64_t]] 
                     arr[row][k] = arr[row + 1][k]
                     arr[row + 1][k] = tmp
 
+
 cdef inline void inplace_sort_2d_array_by_one_column(vector[vector[float64_t]] &arr, \
     int col1) noexcept nogil:
     cdef int i, j, k, row
@@ -206,6 +166,7 @@ cdef inline void inplace_sort_2d_array_by_one_column(vector[vector[float64_t]] &
                     arr[row][k] = arr[row + 1][k]
                     arr[row + 1][k] = tmp
 
+
 cdef inline void set_2d_array_to_zero(vector[vector[float64_t]] &arr) noexcept nogil:
     cdef int i, j
     cdef int rows = arr.size()
@@ -214,6 +175,7 @@ cdef inline void set_2d_array_to_zero(vector[vector[float64_t]] &arr) noexcept n
     for i in range(rows):
         for j in range(cols):
             arr[i][j] = 0.0
+
 
 cdef inline void _init_split(SplitRecord* self, intp_t start_pos) noexcept nogil:
     self.impurity_left = INFINITY
@@ -241,11 +203,13 @@ cdef class Splitter:
         float64_t min_weight_leaf,
         object random_state,
         const cnp.int8_t[:] monotonic_cst,
+        float64_t[:] initial_cost,
         float64_t[:] sensor_cost,
-        float64_t time_cost,
-        float64_t depth_cost,
+        float64_t[:] depth_cost,
+        float64_t[:] measurement_cost,
         float64_t cost_threshold,
         float64_t imp_threshold,
+        bint new_version_flag,
     ):
         """
         Parameters
@@ -286,11 +250,15 @@ cdef class Splitter:
         self.monotonic_cst = monotonic_cst
         self.with_monotonic_cst = monotonic_cst is not None
 
+        self.initial_cost = initial_cost
         self.sensor_cost = sensor_cost
-        self.time_cost = time_cost
         self.depth_cost = depth_cost
+        self.measurement_cost = measurement_cost
+
         self.cost_threshold = cost_threshold
         self.imp_threshold = imp_threshold
+
+        self.new_version_flag = new_version_flag
 
     def __getstate__(self):
         return {}
@@ -305,11 +273,13 @@ cdef class Splitter:
                              self.min_weight_leaf,
                              self.random_state,
                              self.monotonic_cst,
+                             self.initial_cost,
                              self.sensor_cost,
-                             self.time_cost,
                              self.depth_cost,
+                             self.measurement_cost,
                              self.cost_threshold,
-                             self.imp_threshold), self.__getstate__())
+                             self.imp_threshold,
+                             self.new_version_flag), self.__getstate__())
 
     cdef int init(
         self,
@@ -429,9 +399,9 @@ cdef class Splitter:
         float64_t lower_bound,
         float64_t upper_bound,
         Tree tree,
-        int32_t[:] sensor_types,
-        int32_t[:] depth_types,
-        int32_t[:] time_types,        
+        intp_t[:] sensor_types,
+        intp_t[:] depth_types,
+        intp_t[:] time_types,        
     ) except -1 nogil:
 
         """Find the best split on node samples[start:end].
@@ -505,9 +475,9 @@ cdef inline int node_split_best(
     float64_t lower_bound,
     float64_t upper_bound,
     Tree tree,
-    int32_t[:] sensor_types,
-    int32_t[:] depth_types,
-    int32_t[:] time_types,    
+    intp_t[:] sensor_types,
+    intp_t[:] depth_types,
+    intp_t[:] time_types,    
 ) except -1 nogil:
     """Find the best split on node samples[start:end]
 
@@ -556,30 +526,41 @@ cdef inline int node_split_best(
     cdef Node* node
     cdef Node* nodes = tree.nodes
     cdef intp_t node_count = tree.node_count
+
+    cdef float64_t[:] initial_cost = splitter.initial_cost
     cdef float64_t[:] sensor_cost = splitter.sensor_cost
-    cdef float64_t time_cost = splitter.time_cost
-    cdef float64_t depth_cost = splitter.depth_cost
+    cdef float64_t[:] depth_cost = splitter.depth_cost
+    cdef float64_t[:] measurement_cost = splitter.measurement_cost
+
+    # cdef float64_t[:] sensor_types_set
+    # cdef vector[bint] initial_flag_list
+
     cdef float64_t current_cost
     cdef float64_t diff = INFINITY
     cdef float64_t cost_threshold = splitter.cost_threshold
     cdef float64_t imp_threshold = splitter.imp_threshold
     cdef intp_t feature
+
     cdef int32_t sensor_n, depth_n, time_n
     cdef int32_t sensor_f, depth_f, time_f
+
     cdef int max_ind, min_ind
     cdef int feature_ind, best_ind
     cdef int n_ind, ind, r_ind, c_ind
     cdef int node_id, node_id_temp
     cdef int num_nodes_valid = 0
-    # cdef boolean best_flag
+
     cdef vector[vector[float64_t]] obj_arr
-    # cdef vector[vector[float64_t]] obj_arr2
     cdef vector[vector[float64_t]] obj_arr_temp
     cdef vector[SplitRecord] split_list1
     cdef vector[SplitRecord] split_list2
     cdef char buffer[100]
     cdef char buffer2[100]
     cdef char buffer3[100]
+
+    cdef bint new_version_flag = splitter.new_version_flag
+    cdef bint initial_flag
+    cdef bint best_cost_flag, tree_efficient_cost_flag
 
     cdef int max_cost_ind, min_cost_ind
     cdef int max_imp_ind, min_imp_ind
@@ -746,16 +727,23 @@ cdef inline int node_split_best(
             # printf("node_id: %s\n", buffer)   
 
             #### Cost Calculation
-            current_cost = 0.0
-
             sensor_f = sensor_types[best_split.feature]
             depth_f = depth_types[best_split.feature]
             time_f = time_types[best_split.feature]
 
-            time_flag = False
-            depth_flag = False
-            sensor_flag = False
-            best_flag = False
+            current_cost = -initial_cost[sensor_f]
+            current_cost += -sensor_cost[sensor_f]
+            current_cost += -depth_cost[depth_f]
+            current_cost += -measurement_cost[sensor_f]
+
+            # get_set(sensor_types, sensor_types_set)
+            # num_sensor_types = sensor_types_set.size()
+            # for i in range(num_sensor_types):
+            #     initial_flag_list.push_back(False)
+
+            initial_flag = False
+            # depth_flag = True
+            # best_flag = False
 
             for node_id_temp in range(node_count):
                 node = &nodes[node_id_temp]
@@ -768,47 +756,21 @@ cdef inline int node_split_best(
                 depth_n = depth_types[feature]
                 time_n = time_types[feature]
 
-                # turning the flags off favors sensors of the same kind and type
-                if (best_split.feature == feature) and not best_flag:
-                    current_cost += sensor_cost[sensor_f] \
-                        + time_cost + depth_cost
-                    # best_flag = True
+                if (sensor_f == sensor_n) and not initial_flag:
+                    initial_flag = True
+                    current_cost += initial_cost[sensor_f]
 
-                else:
-                    if (sensor_f == sensor_n) and not sensor_flag:
-                        # sensor_flag = True
-                        current_cost += sensor_cost[sensor_f]
+                if (sensor_f == sensor_n):
+                    current_cost += sensor_cost[sensor_f]
 
-                    if (depth_f == depth_n) and (sensor_f == sensor_n) and not depth_flag:
-                        # depth_flag = True
-                        current_cost += depth_cost
+                if (depth_f == depth_n):
+                    current_cost += depth_cost[depth_f]
+
+                if (time_f == time_n):
+                    current_cost += measurement_cost[sensor_f]
+
 
             best_split.cost = current_cost
-
-            # # Reorganize into samples[start:best_split.pos] + samples[best_split.pos:end]
-            # if best_split.pos < end:
-            #     partitioner.partition_samples_final(
-            #         best_split.pos,
-            #         best_split.threshold,
-            #         best_split.feature,
-            #         best_split.n_missing
-            #     )
-            #     criterion.init_missing(best_split.n_missing)
-            #     criterion.missing_go_to_left = best_split.missing_go_to_left
-
-            #     criterion.reset()
-            #     criterion.update(best_split.pos)
-            #     criterion.children_impurity(
-            #         &best_split.impurity_left, &best_split.impurity_right
-            #     )
-
-            #     node_improvement = criterion.impurity_improvement(
-            #         impurity,
-            #         best_split.impurity_left,
-            #         best_split.impurity_right
-            #     )                        
-
-            # best_split.improvement = node_improvement            
 
             ind = num_nodes_valid - 1
 
@@ -1236,24 +1198,28 @@ cdef inline int node_split_best(
             num_nodes_valid += 1
 
             #### Cost Calculation
-            current_cost = 0.0
-
             sensor_f = sensor_types[best_split.feature]
             depth_f = depth_types[best_split.feature]
             time_f = time_types[best_split.feature]
 
-            time_flag = False
-            depth_flag = False
-            sensor_flag = False
-            best_flag = False
+            if new_version_flag:
+                # printf('initialize current cost')
+                current_cost = 0.0
+                current_cost -= initial_cost[sensor_f]
+                current_cost -= sensor_cost[sensor_f]
+                current_cost -= depth_cost[depth_f]
+                current_cost -= measurement_cost[sensor_f]
 
-            for node_id in range(node_count):
-                node = &nodes[node_id]
+            else:
+                current_cost = 0.0
+
+            initial_flag = False
+            # depth_flag = True
+            # best_flag = False
+
+            for node_id_temp in range(node_count):
+                node = &nodes[node_id_temp]
                 feature = node.feature
-
-                # sprintf(buffer, "%d",node_id)
-                # sprintf(buffer2, "%d",feature)
-                # printf("%s,%s\n", buffer, buffer2)
 
                 if (feature == _TREE_LEAF) or (feature == _TREE_UNDEFINED):
                     continue
@@ -1262,22 +1228,66 @@ cdef inline int node_split_best(
                 depth_n = depth_types[feature]
                 time_n = time_types[feature]
 
-                # turning the flags off favors sensors of the same kind and type
-                if (best_split.feature == feature) and not best_flag:
-                    current_cost += sensor_cost[sensor_f] \
-                        + time_cost + depth_cost
-                    # best_flag = True
+                # initial_flag_list[sensor_n - 1] = True
+
+                # sprintf(buffer, "%d",node_id_temp)
+                # printf("node: %s\n", buffer)
+
+                # sprintf(buffer, "%d",sensor_f)
+                # sprintf(buffer2, "%d",depth_f)
+                # sprintf(buffer3, "%d",time_f)
+                # printf("feature_types: %s,%s,%s\n", buffer,buffer2,buffer3)
+
+                # sprintf(buffer, "%d",sensor_n)
+                # sprintf(buffer2, "%d",depth_n)
+                # sprintf(buffer3, "%d",time_n)
+                # printf("node_types: %s,%s,%s\n", buffer,buffer2,buffer3)
+
+                if new_version_flag:
+                    # printf('setting current cost')
+                    if (sensor_f == sensor_n) and not initial_flag:
+                        initial_flag = True
+                        current_cost += initial_cost[sensor_f]
+                        
+                        # sprintf(buffer, "%f",initial_cost[sensor_f])
+                        # printf("init_cost: %s\n", buffer)                        
+
+                    if (time_f == time_n):
+                        current_cost += measurement_cost[sensor_f]
+
+                    # if (best_split.feature == feature):
+                    #     current_cost += sensor_cost[sensor_f] \
+                    #         + depth_cost[depth_f] #+ measurement_cost[sensor_f]
+
+                        # sprintf(buffer, "%f",sensor_cost[sensor_f])
+                        # printf("sensor_cost: %s\n", buffer)
+
+
+                    if (sensor_f == sensor_n) and (depth_f == depth_n):
+                        current_cost += sensor_cost[sensor_f] \
+                            + depth_cost[depth_f]
+
+                        # sprintf(buffer, "%f",current_cost)
+                        # printf("current_cost: %s\n", buffer)
+
+                    elif (depth_f == depth_n):
+                        current_cost += depth_cost[depth_f]   
 
                 else:
-                    if (sensor_f == sensor_n) and not sensor_flag:
-                        # sensor_flag = True
-                        current_cost += sensor_cost[sensor_f]
+                    if (best_split.feature == feature):
+                        current_cost += sensor_cost[sensor_f] \
+                            + depth_cost[depth_f] + measurement_cost[sensor_f]
 
-                    if (depth_f == depth_n) and (sensor_f == sensor_n) and not depth_flag:
-                        # depth_flag = True
-                        current_cost += depth_cost
+                    else:
+                        if (sensor_f == sensor_n):
+                            current_cost += sensor_cost[sensor_f]
+
+                        if (depth_f == depth_n) and (sensor_f == sensor_n):
+                            current_cost += depth_cost[depth_f]                    
 
             best_split.cost = current_cost
+
+            # printf('saving obj_arr_temp')
 
             # ind = <int>(n_visited_features - 1)
             ind = num_nodes_valid - 1
@@ -1338,7 +1348,13 @@ cdef inline int node_split_best(
             # printf('best_cost_flag\n')
 
             for i in range(num_nodes_valid):
+
+                # sprintf(buffer, '%f', cost_range)
+                # printf('cost_range:%s\n', buffer)
             
+                # sprintf(buffer, '%f', imp_range)
+                # printf('imp_range:%s\n', buffer)
+
                 if cost_range == 0:
                     cost_var = 0.0
                 else:
@@ -1353,11 +1369,15 @@ cdef inline int node_split_best(
 
                 obj_arr[i][3] = cost_var + imp_var
 
+                # sprintf(buffer, '%f', cost_var)
+                # printf('cost_var:%s\n', buffer)
+
+                # sprintf(buffer, '%f', imp_var)
+                # printf('imp_var:%s\n', buffer)
 
                 # sprintf(buffer, '%f', obj_arr[i][3])
                 # printf('obj_val:%s\n', buffer)
                 
-
             # inplace_sort_2d_array_by_one_column(obj_arr, 3)
             inplace_sort_2d_array_by_two_columns(obj_arr, 3, 0)
             max_imp_ind = find_max_in_2d_array(obj_arr,0)
@@ -2498,9 +2518,9 @@ cdef class BestSplitter(Splitter):
             float64_t lower_bound,
             float64_t upper_bound,
             Tree tree,
-            int32_t[:] sensor_types,
-            int32_t[:] depth_types,
-            int32_t[:] time_types            
+            intp_t[:] sensor_types,
+            intp_t[:] depth_types,
+            intp_t[:] time_types            
     ) except -1 nogil:
         return node_split_best(
             self,
@@ -2542,9 +2562,9 @@ cdef class BestSparseSplitter(Splitter):
             float64_t lower_bound,
             float64_t upper_bound,
             Tree tree,
-            int32_t[:] sensor_types,
-            int32_t[:] depth_types,
-            int32_t[:] time_types            
+            intp_t[:] sensor_types,
+            intp_t[:] depth_types,
+            intp_t[:] time_types            
     ) except -1 nogil:
         return node_split_best(
             self,
@@ -2586,9 +2606,9 @@ cdef class RandomSplitter(Splitter):
             float64_t lower_bound,
             float64_t upper_bound,
             Tree tree,
-            int32_t[:] sensor_types,
-            int32_t[:] depth_types,
-            int32_t[:] time_types            
+            intp_t[:] sensor_types,
+            intp_t[:] depth_types,
+            intp_t[:] time_types            
     ) except -1 nogil:
         return node_split_random(
             self,
@@ -2625,9 +2645,9 @@ cdef class RandomSparseSplitter(Splitter):
             float64_t lower_bound,
             float64_t upper_bound,
             Tree tree,
-            int32_t[:] sensor_types,
-            int32_t[:] depth_types,
-            int32_t[:] time_types            
+            intp_t[:] sensor_types,
+            intp_t[:] depth_types,
+            intp_t[:] time_types            
     ) except -1 nogil:
         return node_split_random(
             self,

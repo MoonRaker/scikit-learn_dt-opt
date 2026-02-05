@@ -2471,11 +2471,13 @@ struct __pyx_obj_7sklearn_4tree_9_splitter_Splitter {
   __Pyx_memviewslice monotonic_cst;
   int with_monotonic_cst;
   __Pyx_memviewslice sample_weight;
+  int new_version_flag;
   struct __pyx_t_7sklearn_4tree_5_tree_Node *node;
   struct __pyx_t_7sklearn_4tree_5_tree_Node *nodes;
+  __Pyx_memviewslice initial_cost;
   __Pyx_memviewslice sensor_cost;
-  __pyx_t_7sklearn_5utils_9_typedefs_float64_t time_cost;
-  __pyx_t_7sklearn_5utils_9_typedefs_float64_t depth_cost;
+  __Pyx_memviewslice depth_cost;
+  __Pyx_memviewslice measurement_cost;
   __pyx_t_7sklearn_5utils_9_typedefs_float64_t cost_threshold;
   __pyx_t_7sklearn_5utils_9_typedefs_float64_t imp_threshold;
   __pyx_t_7sklearn_5utils_9_typedefs_float64_t current_cost;
@@ -4061,7 +4063,7 @@ static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_nn_
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dc_unsigned_char__const__(PyObject *, int writable_flag);
 
 /* ObjectToMemviewSlice.proto */
-static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(PyObject *, int writable_flag);
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(PyObject *, int writable_flag);
 
 /* ObjectToMemviewSlice.proto */
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_d_dc_nn___pyx_t_7sklearn_5utils_9_typedefs_float64_t__const__(PyObject *, int writable_flag);
@@ -4073,8 +4075,8 @@ static CYTHON_INLINE PyObject *__pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_ty
 static CYTHON_INLINE PyObject *__pyx_memview_get_unsigned_char__const__(const char *itemp);
 
 /* MemviewDtypeToObject.proto */
-static CYTHON_INLINE PyObject *__pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(const char *itemp);
-static CYTHON_INLINE int __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(const char *itemp, PyObject *obj);
+static CYTHON_INLINE PyObject *__pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(const char *itemp);
+static CYTHON_INLINE int __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(const char *itemp, PyObject *obj);
 
 /* ObjectToMemviewSlice.proto */
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_d_dc_nn___pyx_t_7sklearn_5utils_9_typedefs_float32_t(PyObject *, int writable_flag);
@@ -4129,13 +4131,6 @@ static void __Pyx_CppExn2PyErr() {
 
 /* ObjectToMemviewSlice.proto */
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_7sklearn_5utils_9_typedefs_float32_t__const__(PyObject *, int writable_flag);
-
-/* ObjectToMemviewSlice.proto */
-static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(PyObject *, int writable_flag);
-
-/* MemviewDtypeToObject.proto */
-static CYTHON_INLINE PyObject *__pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(const char *itemp);
-static CYTHON_INLINE int __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(const char *itemp, PyObject *obj);
 
 /* ObjectToMemviewSlice.proto */
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_float32_t__const__(PyObject *, int writable_flag);
@@ -4356,17 +4351,17 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_From_unsigned_char(unsigned char valu
 /* CIntFromPy.proto */
 static CYTHON_INLINE unsigned char __Pyx_PyInt_As_unsigned_char(PyObject *);
 
-/* CIntToPy.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value);
-
-/* CIntFromPy.proto */
-static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *);
-
 /* CIntFromPy.proto */
 static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *);
 
 /* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value);
+
+/* CIntToPy.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value);
+
+/* CIntFromPy.proto */
+static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *);
 
 /* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_npy_intp(npy_intp value);
@@ -4679,7 +4674,6 @@ static __Pyx_StructField __Pyx_StructFields_nn_struct____pyx_t_7sklearn_4tree_5_
 static __Pyx_TypeInfo __Pyx_TypeInfo_nn_struct____pyx_t_7sklearn_4tree_5_tree_Node = { "Node", __Pyx_StructFields_nn_struct____pyx_t_7sklearn_4tree_5_tree_Node, sizeof(struct __pyx_t_7sklearn_4tree_5_tree_Node), { 0 }, 0, 'S', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_7sklearn_5utils_9_typedefs_float64_t__const__ = { "const float64_t", NULL, sizeof(__pyx_t_7sklearn_5utils_9_typedefs_float64_t const ), { 0 }, 0, 'R', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_unsigned_char__const__ = { "const unsigned char", NULL, sizeof(unsigned char const ), { 0 }, 0, __PYX_IS_UNSIGNED(unsigned char const ) ? 'U' : 'I', __PYX_IS_UNSIGNED(unsigned char const ), 0 };
-static __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t = { "int32_t", NULL, sizeof(__pyx_t_7sklearn_5utils_9_typedefs_int32_t), { 0 }, 0, __PYX_IS_UNSIGNED(__pyx_t_7sklearn_5utils_9_typedefs_int32_t) ? 'U' : 'I', __PYX_IS_UNSIGNED(__pyx_t_7sklearn_5utils_9_typedefs_int32_t), 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_7sklearn_5utils_9_typedefs_float32_t = { "float32_t", NULL, sizeof(__pyx_t_7sklearn_5utils_9_typedefs_float32_t), { 0 }, 0, 'R', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t__const__ = { "const intp_t", NULL, sizeof(__pyx_t_7sklearn_5utils_9_typedefs_intp_t const ), { 0 }, 0, __PYX_IS_UNSIGNED(__pyx_t_7sklearn_5utils_9_typedefs_intp_t const ) ? 'U' : 'I', __PYX_IS_UNSIGNED(__pyx_t_7sklearn_5utils_9_typedefs_intp_t const ), 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_7sklearn_5utils_9_typedefs_float32_t__const__ = { "const float32_t", NULL, sizeof(__pyx_t_7sklearn_5utils_9_typedefs_float32_t const ), { 0 }, 0, 'R', 0, 0 };
@@ -24891,11 +24885,11 @@ static PyObject *__pyx_f_7sklearn_4tree_5_tree_11TreeBuilder_build(CYTHON_UNUSED
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_v_missing_values_in_feature_mask, 1, (PyObject *(*)(char *)) __pyx_memview_get_unsigned_char__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 90, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_6 = __pyx_memoryview_fromslice(__pyx_v_sensor_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 90, __pyx_L1_error)
+        __pyx_t_6 = __pyx_memoryview_fromslice(__pyx_v_sensor_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 90, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_v_depth_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 90, __pyx_L1_error)
+        __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_v_depth_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 90, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_8 = __pyx_memoryview_fromslice(__pyx_v_time_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 90, __pyx_L1_error)
+        __pyx_t_8 = __pyx_memoryview_fromslice(__pyx_v_time_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 90, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_9 = __pyx_t_1; __pyx_t_10 = NULL;
@@ -24945,7 +24939,7 @@ static PyObject *__pyx_f_7sklearn_4tree_5_tree_11TreeBuilder_build(CYTHON_UNUSED
   }
 
   /* "sklearn/tree/_tree.pyx":101
- *         int32_t[:] time_types=None,
+ *         intp_t[:] time_types=None,
  *     ):
  *         """Build a decision tree from the training set (X, y)."""             # <<<<<<<<<<<<<<
  *         pass
@@ -25154,19 +25148,19 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       __PYX_INC_MEMVIEW(&__pyx_v_missing_values_in_feature_mask, 1);
     }
     if (values[5]) {
-      __pyx_v_sensor_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_sensor_types.memview)) __PYX_ERR(0, 97, __pyx_L3_error)
+      __pyx_v_sensor_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_sensor_types.memview)) __PYX_ERR(0, 97, __pyx_L3_error)
     } else {
       __pyx_v_sensor_types = __pyx_k__29;
       __PYX_INC_MEMVIEW(&__pyx_v_sensor_types, 1);
     }
     if (values[6]) {
-      __pyx_v_depth_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_depth_types.memview)) __PYX_ERR(0, 98, __pyx_L3_error)
+      __pyx_v_depth_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_depth_types.memview)) __PYX_ERR(0, 98, __pyx_L3_error)
     } else {
       __pyx_v_depth_types = __pyx_k__30;
       __PYX_INC_MEMVIEW(&__pyx_v_depth_types, 1);
     }
     if (values[7]) {
-      __pyx_v_time_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_time_types.memview)) __PYX_ERR(0, 99, __pyx_L3_error)
+      __pyx_v_time_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_time_types.memview)) __PYX_ERR(0, 99, __pyx_L3_error)
     } else {
       __pyx_v_time_types = __pyx_k__31;
       __PYX_INC_MEMVIEW(&__pyx_v_time_types, 1);
@@ -26643,11 +26637,11 @@ static PyObject *__pyx_f_7sklearn_4tree_5_tree_21DepthFirstTreeBuilder_build(str
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_v_missing_values_in_feature_mask, 1, (PyObject *(*)(char *)) __pyx_memview_get_unsigned_char__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 169, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_6 = __pyx_memoryview_fromslice(__pyx_v_sensor_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 169, __pyx_L1_error)
+        __pyx_t_6 = __pyx_memoryview_fromslice(__pyx_v_sensor_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 169, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_v_depth_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 169, __pyx_L1_error)
+        __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_v_depth_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 169, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_8 = __pyx_memoryview_fromslice(__pyx_v_time_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 169, __pyx_L1_error)
+        __pyx_t_8 = __pyx_memoryview_fromslice(__pyx_v_time_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 169, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_9 = __pyx_t_1; __pyx_t_10 = NULL;
@@ -28155,19 +28149,19 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       __PYX_INC_MEMVIEW(&__pyx_v_missing_values_in_feature_mask, 1);
     }
     if (values[5]) {
-      __pyx_v_sensor_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_sensor_types.memview)) __PYX_ERR(0, 176, __pyx_L3_error)
+      __pyx_v_sensor_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_sensor_types.memview)) __PYX_ERR(0, 176, __pyx_L3_error)
     } else {
       __pyx_v_sensor_types = __pyx_k__35;
       __PYX_INC_MEMVIEW(&__pyx_v_sensor_types, 1);
     }
     if (values[6]) {
-      __pyx_v_depth_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_depth_types.memview)) __PYX_ERR(0, 177, __pyx_L3_error)
+      __pyx_v_depth_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_depth_types.memview)) __PYX_ERR(0, 177, __pyx_L3_error)
     } else {
       __pyx_v_depth_types = __pyx_k__36;
       __PYX_INC_MEMVIEW(&__pyx_v_depth_types, 1);
     }
     if (values[7]) {
-      __pyx_v_time_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_time_types.memview)) __PYX_ERR(0, 178, __pyx_L3_error)
+      __pyx_v_time_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_time_types.memview)) __PYX_ERR(0, 178, __pyx_L3_error)
     } else {
       __pyx_v_time_types = __pyx_k__37;
       __PYX_INC_MEMVIEW(&__pyx_v_time_types, 1);
@@ -28958,11 +28952,11 @@ static PyObject *__pyx_f_7sklearn_4tree_5_tree_20BestFirstTreeBuilder_build(stru
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_v_missing_values_in_feature_mask, 1, (PyObject *(*)(char *)) __pyx_memview_get_unsigned_char__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 440, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_6 = __pyx_memoryview_fromslice(__pyx_v_sensor_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_6 = __pyx_memoryview_fromslice(__pyx_v_sensor_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 440, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_v_depth_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_v_depth_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 440, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_8 = __pyx_memoryview_fromslice(__pyx_v_time_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_8 = __pyx_memoryview_fromslice(__pyx_v_time_types, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 440, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_9 = __pyx_t_1; __pyx_t_10 = NULL;
@@ -30005,19 +29999,19 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       __PYX_INC_MEMVIEW(&__pyx_v_missing_values_in_feature_mask, 1);
     }
     if (values[5]) {
-      __pyx_v_sensor_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_sensor_types.memview)) __PYX_ERR(0, 447, __pyx_L3_error)
+      __pyx_v_sensor_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_sensor_types.memview)) __PYX_ERR(0, 447, __pyx_L3_error)
     } else {
       __pyx_v_sensor_types = __pyx_k__40;
       __PYX_INC_MEMVIEW(&__pyx_v_sensor_types, 1);
     }
     if (values[6]) {
-      __pyx_v_depth_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_depth_types.memview)) __PYX_ERR(0, 448, __pyx_L3_error)
+      __pyx_v_depth_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_depth_types.memview)) __PYX_ERR(0, 448, __pyx_L3_error)
     } else {
       __pyx_v_depth_types = __pyx_k__41;
       __PYX_INC_MEMVIEW(&__pyx_v_depth_types, 1);
     }
     if (values[7]) {
-      __pyx_v_time_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_time_types.memview)) __PYX_ERR(0, 449, __pyx_L3_error)
+      __pyx_v_time_types = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_time_types.memview)) __PYX_ERR(0, 449, __pyx_L3_error)
     } else {
       __pyx_v_time_types = __pyx_k__42;
       __PYX_INC_MEMVIEW(&__pyx_v_time_types, 1);
@@ -52156,7 +52150,7 @@ if (!__Pyx_RefNanny) {
  *         const float64_t[:, ::1] y,
  *         const float64_t[:] sample_weight=None,             # <<<<<<<<<<<<<<
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,
+ *         intp_t[:] sensor_types=None,
  */
   __pyx_t_14 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_float64_t__const__(Py_None, 0); if (unlikely(!__pyx_t_14.memview)) __PYX_ERR(0, 95, __pyx_L1_error)
   __pyx_k__27 = __pyx_t_14;
@@ -52167,8 +52161,8 @@ if (!__Pyx_RefNanny) {
  *         const float64_t[:, ::1] y,
  *         const float64_t[:] sample_weight=None,
  *         const unsigned char[::1] missing_values_in_feature_mask=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,
  */
   __pyx_t_15 = __Pyx_PyObject_to_MemoryviewSlice_dc_unsigned_char__const__(Py_None, 0); if (unlikely(!__pyx_t_15.memview)) __PYX_ERR(0, 96, __pyx_L1_error)
   __pyx_k__28 = __pyx_t_15;
@@ -52178,35 +52172,35 @@ if (!__Pyx_RefNanny) {
   /* "sklearn/tree/_tree.pyx":97
  *         const float64_t[:] sample_weight=None,
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] depth_types=None,
- *         int32_t[:] time_types=None,
+ *         intp_t[:] sensor_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] depth_types=None,
+ *         intp_t[:] time_types=None,
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 97, __pyx_L1_error)
   __pyx_k__29 = __pyx_t_16;
   __pyx_t_16.memview = NULL;
   __pyx_t_16.data = NULL;
 
   /* "sklearn/tree/_tree.pyx":98
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] time_types=None,
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] time_types=None,
  *     ):
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 98, __pyx_L1_error)
   __pyx_k__30 = __pyx_t_16;
   __pyx_t_16.memview = NULL;
   __pyx_t_16.data = NULL;
 
   /* "sklearn/tree/_tree.pyx":99
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,
- *         int32_t[:] time_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,
+ *         intp_t[:] time_types=None,             # <<<<<<<<<<<<<<
  *     ):
  *         """Build a decision tree from the training set (X, y)."""
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 99, __pyx_L1_error)
   __pyx_k__31 = __pyx_t_16;
   __pyx_t_16.memview = NULL;
   __pyx_t_16.data = NULL;
@@ -52216,7 +52210,7 @@ if (!__Pyx_RefNanny) {
  *         const float64_t[:, ::1] y,
  *         const float64_t[:] sample_weight=None,             # <<<<<<<<<<<<<<
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,
+ *         intp_t[:] sensor_types=None,
  */
   __pyx_t_14 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_float64_t__const__(Py_None, 0); if (unlikely(!__pyx_t_14.memview)) __PYX_ERR(0, 95, __pyx_L1_error)
   __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_t_14, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_float64_t__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 95, __pyx_L1_error)
@@ -52228,8 +52222,8 @@ if (!__Pyx_RefNanny) {
  *         const float64_t[:, ::1] y,
  *         const float64_t[:] sample_weight=None,
  *         const unsigned char[::1] missing_values_in_feature_mask=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,
  */
   __pyx_t_15 = __Pyx_PyObject_to_MemoryviewSlice_dc_unsigned_char__const__(Py_None, 0); if (unlikely(!__pyx_t_15.memview)) __PYX_ERR(0, 96, __pyx_L1_error)
   __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_t_15, 1, (PyObject *(*)(char *)) __pyx_memview_get_unsigned_char__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 96, __pyx_L1_error)
@@ -52240,38 +52234,38 @@ if (!__Pyx_RefNanny) {
   /* "sklearn/tree/_tree.pyx":97
  *         const float64_t[:] sample_weight=None,
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] depth_types=None,
- *         int32_t[:] time_types=None,
+ *         intp_t[:] sensor_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] depth_types=None,
+ *         intp_t[:] time_types=None,
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 97, __pyx_L1_error)
-  __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __PYX_XCLEAR_MEMVIEW(&__pyx_t_16, 1);
   __pyx_t_16.memview = NULL; __pyx_t_16.data = NULL;
 
   /* "sklearn/tree/_tree.pyx":98
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] time_types=None,
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] time_types=None,
  *     ):
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 98, __pyx_L1_error)
-  __pyx_t_17 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __pyx_t_17 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 98, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_17);
   __PYX_XCLEAR_MEMVIEW(&__pyx_t_16, 1);
   __pyx_t_16.memview = NULL; __pyx_t_16.data = NULL;
 
   /* "sklearn/tree/_tree.pyx":99
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,
- *         int32_t[:] time_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,
+ *         intp_t[:] time_types=None,             # <<<<<<<<<<<<<<
  *     ):
  *         """Build a decision tree from the training set (X, y)."""
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 99, __pyx_L1_error)
-  __pyx_t_18 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_18 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 99, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
   __PYX_XCLEAR_MEMVIEW(&__pyx_t_16, 1);
   __pyx_t_16.memview = NULL; __pyx_t_16.data = NULL;
@@ -52336,7 +52330,7 @@ if (!__Pyx_RefNanny) {
  *         const float64_t[:, ::1] y,
  *         const float64_t[:] sample_weight=None,             # <<<<<<<<<<<<<<
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,
+ *         intp_t[:] sensor_types=None,
  */
   __pyx_t_20 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_float64_t__const__(Py_None, 0); if (unlikely(!__pyx_t_20.memview)) __PYX_ERR(0, 174, __pyx_L1_error)
   __pyx_k__33 = __pyx_t_20;
@@ -52347,8 +52341,8 @@ if (!__Pyx_RefNanny) {
  *         const float64_t[:, ::1] y,
  *         const float64_t[:] sample_weight=None,
  *         const unsigned char[::1] missing_values_in_feature_mask=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,
  */
   __pyx_t_21 = __Pyx_PyObject_to_MemoryviewSlice_dc_unsigned_char__const__(Py_None, 0); if (unlikely(!__pyx_t_21.memview)) __PYX_ERR(0, 175, __pyx_L1_error)
   __pyx_k__34 = __pyx_t_21;
@@ -52358,35 +52352,35 @@ if (!__Pyx_RefNanny) {
   /* "sklearn/tree/_tree.pyx":176
  *         const float64_t[:] sample_weight=None,
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] depth_types=None,
- *         int32_t[:] time_types=None,
+ *         intp_t[:] sensor_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] depth_types=None,
+ *         intp_t[:] time_types=None,
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 176, __pyx_L1_error)
   __pyx_k__35 = __pyx_t_16;
   __pyx_t_16.memview = NULL;
   __pyx_t_16.data = NULL;
 
   /* "sklearn/tree/_tree.pyx":177
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] time_types=None,
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] time_types=None,
  *     ):
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 177, __pyx_L1_error)
   __pyx_k__36 = __pyx_t_16;
   __pyx_t_16.memview = NULL;
   __pyx_t_16.data = NULL;
 
   /* "sklearn/tree/_tree.pyx":178
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,
- *         int32_t[:] time_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,
+ *         intp_t[:] time_types=None,             # <<<<<<<<<<<<<<
  *     ):
  *         """Build a decision tree from the training set (X, y)."""
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 178, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 178, __pyx_L1_error)
   __pyx_k__37 = __pyx_t_16;
   __pyx_t_16.memview = NULL;
   __pyx_t_16.data = NULL;
@@ -52396,7 +52390,7 @@ if (!__Pyx_RefNanny) {
  *         const float64_t[:, ::1] y,
  *         const float64_t[:] sample_weight=None,             # <<<<<<<<<<<<<<
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,
+ *         intp_t[:] sensor_types=None,
  */
   __pyx_t_20 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_float64_t__const__(Py_None, 0); if (unlikely(!__pyx_t_20.memview)) __PYX_ERR(0, 174, __pyx_L1_error)
   __pyx_t_18 = __pyx_memoryview_fromslice(__pyx_t_20, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_float64_t__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 174, __pyx_L1_error)
@@ -52408,8 +52402,8 @@ if (!__Pyx_RefNanny) {
  *         const float64_t[:, ::1] y,
  *         const float64_t[:] sample_weight=None,
  *         const unsigned char[::1] missing_values_in_feature_mask=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,
  */
   __pyx_t_21 = __Pyx_PyObject_to_MemoryviewSlice_dc_unsigned_char__const__(Py_None, 0); if (unlikely(!__pyx_t_21.memview)) __PYX_ERR(0, 175, __pyx_L1_error)
   __pyx_t_19 = __pyx_memoryview_fromslice(__pyx_t_21, 1, (PyObject *(*)(char *)) __pyx_memview_get_unsigned_char__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 175, __pyx_L1_error)
@@ -52420,38 +52414,38 @@ if (!__Pyx_RefNanny) {
   /* "sklearn/tree/_tree.pyx":176
  *         const float64_t[:] sample_weight=None,
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] depth_types=None,
- *         int32_t[:] time_types=None,
+ *         intp_t[:] sensor_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] depth_types=None,
+ *         intp_t[:] time_types=None,
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 176, __pyx_L1_error)
-  __pyx_t_17 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_t_17 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 176, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_17);
   __PYX_XCLEAR_MEMVIEW(&__pyx_t_16, 1);
   __pyx_t_16.memview = NULL; __pyx_t_16.data = NULL;
 
   /* "sklearn/tree/_tree.pyx":177
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] time_types=None,
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] time_types=None,
  *     ):
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 177, __pyx_L1_error)
-  __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 177, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __PYX_XCLEAR_MEMVIEW(&__pyx_t_16, 1);
   __pyx_t_16.memview = NULL; __pyx_t_16.data = NULL;
 
   /* "sklearn/tree/_tree.pyx":178
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,
- *         int32_t[:] time_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,
+ *         intp_t[:] time_types=None,             # <<<<<<<<<<<<<<
  *     ):
  *         """Build a decision tree from the training set (X, y)."""
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 178, __pyx_L1_error)
-  __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 178, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 178, __pyx_L1_error)
+  __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 178, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __PYX_XCLEAR_MEMVIEW(&__pyx_t_16, 1);
   __pyx_t_16.memview = NULL; __pyx_t_16.data = NULL;
@@ -52514,7 +52508,7 @@ if (!__Pyx_RefNanny) {
  *         const float64_t[:, ::1] y,
  *         const float64_t[:] sample_weight=None,             # <<<<<<<<<<<<<<
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,
+ *         intp_t[:] sensor_types=None,
  */
   __pyx_t_22 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_float64_t__const__(Py_None, 0); if (unlikely(!__pyx_t_22.memview)) __PYX_ERR(0, 445, __pyx_L1_error)
   __pyx_k__38 = __pyx_t_22;
@@ -52525,8 +52519,8 @@ if (!__Pyx_RefNanny) {
  *         const float64_t[:, ::1] y,
  *         const float64_t[:] sample_weight=None,
  *         const unsigned char[::1] missing_values_in_feature_mask=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,
  */
   __pyx_t_23 = __Pyx_PyObject_to_MemoryviewSlice_dc_unsigned_char__const__(Py_None, 0); if (unlikely(!__pyx_t_23.memview)) __PYX_ERR(0, 446, __pyx_L1_error)
   __pyx_k__39 = __pyx_t_23;
@@ -52536,35 +52530,35 @@ if (!__Pyx_RefNanny) {
   /* "sklearn/tree/_tree.pyx":447
  *         const float64_t[:] sample_weight=None,
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] depth_types=None,
- *         int32_t[:] time_types=None,
+ *         intp_t[:] sensor_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] depth_types=None,
+ *         intp_t[:] time_types=None,
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 447, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 447, __pyx_L1_error)
   __pyx_k__40 = __pyx_t_16;
   __pyx_t_16.memview = NULL;
   __pyx_t_16.data = NULL;
 
   /* "sklearn/tree/_tree.pyx":448
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] time_types=None,
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] time_types=None,
  *     ):
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 448, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 448, __pyx_L1_error)
   __pyx_k__41 = __pyx_t_16;
   __pyx_t_16.memview = NULL;
   __pyx_t_16.data = NULL;
 
   /* "sklearn/tree/_tree.pyx":449
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,
- *         int32_t[:] time_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,
+ *         intp_t[:] time_types=None,             # <<<<<<<<<<<<<<
  *     ):
  *         """Build a decision tree from the training set (X, y)."""
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 449, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 449, __pyx_L1_error)
   __pyx_k__42 = __pyx_t_16;
   __pyx_t_16.memview = NULL;
   __pyx_t_16.data = NULL;
@@ -52574,7 +52568,7 @@ if (!__Pyx_RefNanny) {
  *         const float64_t[:, ::1] y,
  *         const float64_t[:] sample_weight=None,             # <<<<<<<<<<<<<<
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,
+ *         intp_t[:] sensor_types=None,
  */
   __pyx_t_22 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_float64_t__const__(Py_None, 0); if (unlikely(!__pyx_t_22.memview)) __PYX_ERR(0, 445, __pyx_L1_error)
   __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_t_22, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_float64_t__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 445, __pyx_L1_error)
@@ -52586,8 +52580,8 @@ if (!__Pyx_RefNanny) {
  *         const float64_t[:, ::1] y,
  *         const float64_t[:] sample_weight=None,
  *         const unsigned char[::1] missing_values_in_feature_mask=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,
  */
   __pyx_t_23 = __Pyx_PyObject_to_MemoryviewSlice_dc_unsigned_char__const__(Py_None, 0); if (unlikely(!__pyx_t_23.memview)) __PYX_ERR(0, 446, __pyx_L1_error)
   __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_t_23, 1, (PyObject *(*)(char *)) __pyx_memview_get_unsigned_char__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 446, __pyx_L1_error)
@@ -52598,38 +52592,38 @@ if (!__Pyx_RefNanny) {
   /* "sklearn/tree/_tree.pyx":447
  *         const float64_t[:] sample_weight=None,
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] depth_types=None,
- *         int32_t[:] time_types=None,
+ *         intp_t[:] sensor_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] depth_types=None,
+ *         intp_t[:] time_types=None,
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 447, __pyx_L1_error)
-  __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 447, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 447, __pyx_L1_error)
+  __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 447, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __PYX_XCLEAR_MEMVIEW(&__pyx_t_16, 1);
   __pyx_t_16.memview = NULL; __pyx_t_16.data = NULL;
 
   /* "sklearn/tree/_tree.pyx":448
  *         const unsigned char[::1] missing_values_in_feature_mask=None,
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,             # <<<<<<<<<<<<<<
- *         int32_t[:] time_types=None,
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] time_types=None,
  *     ):
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 448, __pyx_L1_error)
-  __pyx_t_17 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 448, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 448, __pyx_L1_error)
+  __pyx_t_17 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 448, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_17);
   __PYX_XCLEAR_MEMVIEW(&__pyx_t_16, 1);
   __pyx_t_16.memview = NULL; __pyx_t_16.data = NULL;
 
   /* "sklearn/tree/_tree.pyx":449
- *         int32_t[:] sensor_types=None,
- *         int32_t[:] depth_types=None,
- *         int32_t[:] time_types=None,             # <<<<<<<<<<<<<<
+ *         intp_t[:] sensor_types=None,
+ *         intp_t[:] depth_types=None,
+ *         intp_t[:] time_types=None,             # <<<<<<<<<<<<<<
  *     ):
  *         """Build a decision tree from the training set (X, y)."""
  */
-  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 449, __pyx_L1_error)
-  __pyx_t_19 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, 0);; if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 449, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 449, __pyx_L1_error)
+  __pyx_t_19 = __pyx_memoryview_fromslice(__pyx_t_16, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, 0);; if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 449, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_19);
   __PYX_XCLEAR_MEMVIEW(&__pyx_t_16, 1);
   __pyx_t_16.memview = NULL; __pyx_t_16.data = NULL;
@@ -59371,7 +59365,7 @@ __pyx_fail:
 }
 
 /* ObjectToMemviewSlice */
-  static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(PyObject *obj, int writable_flag) {
+  static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(PyObject *obj, int writable_flag) {
     __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
     __Pyx_BufFmt_StackElem stack[1];
     int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
@@ -59382,7 +59376,7 @@ __pyx_fail:
     }
     retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
                                                  PyBUF_RECORDS_RO | writable_flag, 1,
-                                                 &__Pyx_TypeInfo_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t, stack,
+                                                 &__Pyx_TypeInfo_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, stack,
                                                  &result, obj);
     if (unlikely(retcode == -1))
         goto __pyx_fail;
@@ -59427,14 +59421,14 @@ __pyx_fail:
 }
 
 /* MemviewDtypeToObject */
-  static CYTHON_INLINE PyObject *__pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(const char *itemp) {
-    return (PyObject *) __Pyx_PyInt_From_int(*(__pyx_t_7sklearn_5utils_9_typedefs_int32_t *) itemp);
+  static CYTHON_INLINE PyObject *__pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(const char *itemp) {
+    return (PyObject *) PyInt_FromSsize_t(*(__pyx_t_7sklearn_5utils_9_typedefs_intp_t *) itemp);
 }
-static CYTHON_INLINE int __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_int32_t(const char *itemp, PyObject *obj) {
-    __pyx_t_7sklearn_5utils_9_typedefs_int32_t value = __Pyx_PyInt_As_int(obj);
-    if (unlikely((value == (int)-1) && PyErr_Occurred()))
+static CYTHON_INLINE int __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(const char *itemp, PyObject *obj) {
+    __pyx_t_7sklearn_5utils_9_typedefs_intp_t value = __Pyx_PyIndex_AsSsize_t(obj);
+    if (unlikely((value == (Py_ssize_t)-1) && PyErr_Occurred()))
         return 0;
-    *(__pyx_t_7sklearn_5utils_9_typedefs_int32_t *) itemp = value;
+    *(__pyx_t_7sklearn_5utils_9_typedefs_intp_t *) itemp = value;
     return 1;
 }
 
@@ -59528,41 +59522,6 @@ __pyx_fail:
     result.memview = NULL;
     result.data = NULL;
     return result;
-}
-
-/* ObjectToMemviewSlice */
-  static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(PyObject *obj, int writable_flag) {
-    __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
-    __Pyx_BufFmt_StackElem stack[1];
-    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
-    int retcode;
-    if (obj == Py_None) {
-        result.memview = (struct __pyx_memoryview_obj *) Py_None;
-        return result;
-    }
-    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
-                                                 PyBUF_RECORDS_RO | writable_flag, 1,
-                                                 &__Pyx_TypeInfo_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t, stack,
-                                                 &result, obj);
-    if (unlikely(retcode == -1))
-        goto __pyx_fail;
-    return result;
-__pyx_fail:
-    result.memview = NULL;
-    result.data = NULL;
-    return result;
-}
-
-/* MemviewDtypeToObject */
-  static CYTHON_INLINE PyObject *__pyx_memview_get_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(const char *itemp) {
-    return (PyObject *) PyInt_FromSsize_t(*(__pyx_t_7sklearn_5utils_9_typedefs_intp_t *) itemp);
-}
-static CYTHON_INLINE int __pyx_memview_set_nn___pyx_t_7sklearn_5utils_9_typedefs_intp_t(const char *itemp, PyObject *obj) {
-    __pyx_t_7sklearn_5utils_9_typedefs_intp_t value = __Pyx_PyIndex_AsSsize_t(obj);
-    if (unlikely((value == (Py_ssize_t)-1) && PyErr_Occurred()))
-        return 0;
-    *(__pyx_t_7sklearn_5utils_9_typedefs_intp_t *) itemp = value;
-    return 1;
 }
 
 /* ObjectToMemviewSlice */
@@ -60831,344 +60790,6 @@ raise_neg_overflow:
     return (unsigned char) -1;
 }
 
-/* CIntToPy */
-  static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-    const int neg_one = (int) -1, const_zero = (int) 0;
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic pop
-#endif
-    const int is_unsigned = neg_one > const_zero;
-    if (is_unsigned) {
-        if (sizeof(int) < sizeof(long)) {
-            return PyInt_FromLong((long) value);
-        } else if (sizeof(int) <= sizeof(unsigned long)) {
-            return PyLong_FromUnsignedLong((unsigned long) value);
-#ifdef HAVE_LONG_LONG
-        } else if (sizeof(int) <= sizeof(unsigned PY_LONG_LONG)) {
-            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
-#endif
-        }
-    } else {
-        if (sizeof(int) <= sizeof(long)) {
-            return PyInt_FromLong((long) value);
-#ifdef HAVE_LONG_LONG
-        } else if (sizeof(int) <= sizeof(PY_LONG_LONG)) {
-            return PyLong_FromLongLong((PY_LONG_LONG) value);
-#endif
-        }
-    }
-    {
-        unsigned char *bytes = (unsigned char *)&value;
-#if !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX >= 0x030d00A4
-        if (is_unsigned) {
-            return PyLong_FromUnsignedNativeBytes(bytes, sizeof(value), -1);
-        } else {
-            return PyLong_FromNativeBytes(bytes, sizeof(value), -1);
-        }
-#elif !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x030d0000
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        return _PyLong_FromByteArray(bytes, sizeof(int),
-                                     little, !is_unsigned);
-#else
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        PyObject *from_bytes, *result = NULL;
-        PyObject *py_bytes = NULL, *arg_tuple = NULL, *kwds = NULL, *order_str = NULL;
-        from_bytes = PyObject_GetAttrString((PyObject*)&PyLong_Type, "from_bytes");
-        if (!from_bytes) return NULL;
-        py_bytes = PyBytes_FromStringAndSize((char*)bytes, sizeof(int));
-        if (!py_bytes) goto limited_bad;
-        order_str = PyUnicode_FromString(little ? "little" : "big");
-        if (!order_str) goto limited_bad;
-        arg_tuple = PyTuple_Pack(2, py_bytes, order_str);
-        if (!arg_tuple) goto limited_bad;
-        if (!is_unsigned) {
-            kwds = PyDict_New();
-            if (!kwds) goto limited_bad;
-            if (PyDict_SetItemString(kwds, "signed", __Pyx_NewRef(Py_True))) goto limited_bad;
-        }
-        result = PyObject_Call(from_bytes, arg_tuple, kwds);
-        limited_bad:
-        Py_XDECREF(kwds);
-        Py_XDECREF(arg_tuple);
-        Py_XDECREF(order_str);
-        Py_XDECREF(py_bytes);
-        Py_XDECREF(from_bytes);
-        return result;
-#endif
-    }
-}
-
-/* CIntFromPy */
-  static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-    const int neg_one = (int) -1, const_zero = (int) 0;
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic pop
-#endif
-    const int is_unsigned = neg_one > const_zero;
-#if PY_MAJOR_VERSION < 3
-    if (likely(PyInt_Check(x))) {
-        if ((sizeof(int) < sizeof(long))) {
-            __PYX_VERIFY_RETURN_INT(int, long, PyInt_AS_LONG(x))
-        } else {
-            long val = PyInt_AS_LONG(x);
-            if (is_unsigned && unlikely(val < 0)) {
-                goto raise_neg_overflow;
-            }
-            return (int) val;
-        }
-    }
-#endif
-    if (unlikely(!PyLong_Check(x))) {
-        int val;
-        PyObject *tmp = __Pyx_PyNumber_IntOrLong(x);
-        if (!tmp) return (int) -1;
-        val = __Pyx_PyInt_As_int(tmp);
-        Py_DECREF(tmp);
-        return val;
-    }
-    if (is_unsigned) {
-#if CYTHON_USE_PYLONG_INTERNALS
-        if (unlikely(__Pyx_PyLong_IsNeg(x))) {
-            goto raise_neg_overflow;
-        } else if (__Pyx_PyLong_IsCompact(x)) {
-            __PYX_VERIFY_RETURN_INT(int, __Pyx_compact_upylong, __Pyx_PyLong_CompactValueUnsigned(x))
-        } else {
-            const digit* digits = __Pyx_PyLong_Digits(x);
-            assert(__Pyx_PyLong_DigitCount(x) > 1);
-            switch (__Pyx_PyLong_DigitCount(x)) {
-                case 2:
-                    if ((8 * sizeof(int) > 1 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) >= 2 * PyLong_SHIFT)) {
-                            return (int) (((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
-                        }
-                    }
-                    break;
-                case 3:
-                    if ((8 * sizeof(int) > 2 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) >= 3 * PyLong_SHIFT)) {
-                            return (int) (((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
-                        }
-                    }
-                    break;
-                case 4:
-                    if ((8 * sizeof(int) > 3 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) >= 4 * PyLong_SHIFT)) {
-                            return (int) (((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
-                        }
-                    }
-                    break;
-            }
-        }
-#endif
-#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX < 0x030C00A7
-        if (unlikely(Py_SIZE(x) < 0)) {
-            goto raise_neg_overflow;
-        }
-#else
-        {
-            int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
-            if (unlikely(result < 0))
-                return (int) -1;
-            if (unlikely(result == 1))
-                goto raise_neg_overflow;
-        }
-#endif
-        if ((sizeof(int) <= sizeof(unsigned long))) {
-            __PYX_VERIFY_RETURN_INT_EXC(int, unsigned long, PyLong_AsUnsignedLong(x))
-#ifdef HAVE_LONG_LONG
-        } else if ((sizeof(int) <= sizeof(unsigned PY_LONG_LONG))) {
-            __PYX_VERIFY_RETURN_INT_EXC(int, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
-#endif
-        }
-    } else {
-#if CYTHON_USE_PYLONG_INTERNALS
-        if (__Pyx_PyLong_IsCompact(x)) {
-            __PYX_VERIFY_RETURN_INT(int, __Pyx_compact_pylong, __Pyx_PyLong_CompactValue(x))
-        } else {
-            const digit* digits = __Pyx_PyLong_Digits(x);
-            assert(__Pyx_PyLong_DigitCount(x) > 1);
-            switch (__Pyx_PyLong_SignedDigitCount(x)) {
-                case -2:
-                    if ((8 * sizeof(int) - 1 > 1 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) - 1 > 2 * PyLong_SHIFT)) {
-                            return (int) (((int)-1)*(((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case 2:
-                    if ((8 * sizeof(int) > 1 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) - 1 > 2 * PyLong_SHIFT)) {
-                            return (int) ((((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case -3:
-                    if ((8 * sizeof(int) - 1 > 2 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) - 1 > 3 * PyLong_SHIFT)) {
-                            return (int) (((int)-1)*(((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case 3:
-                    if ((8 * sizeof(int) > 2 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) - 1 > 3 * PyLong_SHIFT)) {
-                            return (int) ((((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case -4:
-                    if ((8 * sizeof(int) - 1 > 3 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) - 1 > 4 * PyLong_SHIFT)) {
-                            return (int) (((int)-1)*(((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case 4:
-                    if ((8 * sizeof(int) > 3 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) - 1 > 4 * PyLong_SHIFT)) {
-                            return (int) ((((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-            }
-        }
-#endif
-        if ((sizeof(int) <= sizeof(long))) {
-            __PYX_VERIFY_RETURN_INT_EXC(int, long, PyLong_AsLong(x))
-#ifdef HAVE_LONG_LONG
-        } else if ((sizeof(int) <= sizeof(PY_LONG_LONG))) {
-            __PYX_VERIFY_RETURN_INT_EXC(int, PY_LONG_LONG, PyLong_AsLongLong(x))
-#endif
-        }
-    }
-    {
-        int val;
-        int ret = -1;
-#if PY_VERSION_HEX >= 0x030d00A6 && !CYTHON_COMPILING_IN_LIMITED_API
-        Py_ssize_t bytes_copied = PyLong_AsNativeBytes(
-            x, &val, sizeof(val), Py_ASNATIVEBYTES_NATIVE_ENDIAN | (is_unsigned ? Py_ASNATIVEBYTES_UNSIGNED_BUFFER | Py_ASNATIVEBYTES_REJECT_NEGATIVE : 0));
-        if (unlikely(bytes_copied == -1)) {
-        } else if (unlikely(bytes_copied > (Py_ssize_t) sizeof(val))) {
-            goto raise_overflow;
-        } else {
-            ret = 0;
-        }
-#elif PY_VERSION_HEX < 0x030d0000 && !(CYTHON_COMPILING_IN_PYPY || CYTHON_COMPILING_IN_LIMITED_API) || defined(_PyLong_AsByteArray)
-        int one = 1; int is_little = (int)*(unsigned char *)&one;
-        unsigned char *bytes = (unsigned char *)&val;
-        ret = _PyLong_AsByteArray((PyLongObject *)x,
-                                    bytes, sizeof(val),
-                                    is_little, !is_unsigned);
-#else
-        PyObject *v;
-        PyObject *stepval = NULL, *mask = NULL, *shift = NULL;
-        int bits, remaining_bits, is_negative = 0;
-        int chunk_size = (sizeof(long) < 8) ? 30 : 62;
-        if (likely(PyLong_CheckExact(x))) {
-            v = __Pyx_NewRef(x);
-        } else {
-            v = PyNumber_Long(x);
-            if (unlikely(!v)) return (int) -1;
-            assert(PyLong_CheckExact(v));
-        }
-        {
-            int result = PyObject_RichCompareBool(v, Py_False, Py_LT);
-            if (unlikely(result < 0)) {
-                Py_DECREF(v);
-                return (int) -1;
-            }
-            is_negative = result == 1;
-        }
-        if (is_unsigned && unlikely(is_negative)) {
-            Py_DECREF(v);
-            goto raise_neg_overflow;
-        } else if (is_negative) {
-            stepval = PyNumber_Invert(v);
-            Py_DECREF(v);
-            if (unlikely(!stepval))
-                return (int) -1;
-        } else {
-            stepval = v;
-        }
-        v = NULL;
-        val = (int) 0;
-        mask = PyLong_FromLong((1L << chunk_size) - 1); if (unlikely(!mask)) goto done;
-        shift = PyLong_FromLong(chunk_size); if (unlikely(!shift)) goto done;
-        for (bits = 0; bits < (int) sizeof(int) * 8 - chunk_size; bits += chunk_size) {
-            PyObject *tmp, *digit;
-            long idigit;
-            digit = PyNumber_And(stepval, mask);
-            if (unlikely(!digit)) goto done;
-            idigit = PyLong_AsLong(digit);
-            Py_DECREF(digit);
-            if (unlikely(idigit < 0)) goto done;
-            val |= ((int) idigit) << bits;
-            tmp = PyNumber_Rshift(stepval, shift);
-            if (unlikely(!tmp)) goto done;
-            Py_DECREF(stepval); stepval = tmp;
-        }
-        Py_DECREF(shift); shift = NULL;
-        Py_DECREF(mask); mask = NULL;
-        {
-            long idigit = PyLong_AsLong(stepval);
-            if (unlikely(idigit < 0)) goto done;
-            remaining_bits = ((int) sizeof(int) * 8) - bits - (is_unsigned ? 0 : 1);
-            if (unlikely(idigit >= (1L << remaining_bits)))
-                goto raise_overflow;
-            val |= ((int) idigit) << bits;
-        }
-        if (!is_unsigned) {
-            if (unlikely(val & (((int) 1) << (sizeof(int) * 8 - 1))))
-                goto raise_overflow;
-            if (is_negative)
-                val = ~val;
-        }
-        ret = 0;
-    done:
-        Py_XDECREF(shift);
-        Py_XDECREF(mask);
-        Py_XDECREF(stepval);
-#endif
-        if (unlikely(ret))
-            return (int) -1;
-        return val;
-    }
-raise_overflow:
-    PyErr_SetString(PyExc_OverflowError,
-        "value too large to convert to int");
-    return (int) -1;
-raise_neg_overflow:
-    PyErr_SetString(PyExc_OverflowError,
-        "can't convert negative value to int");
-    return (int) -1;
-}
-
 /* CIntFromPy */
   static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *x) {
 #ifdef __Pyx_HAS_GCC_DIAGNOSTIC
@@ -61505,6 +61126,344 @@ raise_neg_overflow:
         return result;
 #endif
     }
+}
+
+/* CIntToPy */
+  static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+    const int neg_one = (int) -1, const_zero = (int) 0;
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(int) < sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(int) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(int) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+#endif
+        }
+    } else {
+        if (sizeof(int) <= sizeof(long)) {
+            return PyInt_FromLong((long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(int) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+#endif
+        }
+    }
+    {
+        unsigned char *bytes = (unsigned char *)&value;
+#if !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX >= 0x030d00A4
+        if (is_unsigned) {
+            return PyLong_FromUnsignedNativeBytes(bytes, sizeof(value), -1);
+        } else {
+            return PyLong_FromNativeBytes(bytes, sizeof(value), -1);
+        }
+#elif !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x030d0000
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        return _PyLong_FromByteArray(bytes, sizeof(int),
+                                     little, !is_unsigned);
+#else
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        PyObject *from_bytes, *result = NULL;
+        PyObject *py_bytes = NULL, *arg_tuple = NULL, *kwds = NULL, *order_str = NULL;
+        from_bytes = PyObject_GetAttrString((PyObject*)&PyLong_Type, "from_bytes");
+        if (!from_bytes) return NULL;
+        py_bytes = PyBytes_FromStringAndSize((char*)bytes, sizeof(int));
+        if (!py_bytes) goto limited_bad;
+        order_str = PyUnicode_FromString(little ? "little" : "big");
+        if (!order_str) goto limited_bad;
+        arg_tuple = PyTuple_Pack(2, py_bytes, order_str);
+        if (!arg_tuple) goto limited_bad;
+        if (!is_unsigned) {
+            kwds = PyDict_New();
+            if (!kwds) goto limited_bad;
+            if (PyDict_SetItemString(kwds, "signed", __Pyx_NewRef(Py_True))) goto limited_bad;
+        }
+        result = PyObject_Call(from_bytes, arg_tuple, kwds);
+        limited_bad:
+        Py_XDECREF(kwds);
+        Py_XDECREF(arg_tuple);
+        Py_XDECREF(order_str);
+        Py_XDECREF(py_bytes);
+        Py_XDECREF(from_bytes);
+        return result;
+#endif
+    }
+}
+
+/* CIntFromPy */
+  static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+    const int neg_one = (int) -1, const_zero = (int) 0;
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif
+    const int is_unsigned = neg_one > const_zero;
+#if PY_MAJOR_VERSION < 3
+    if (likely(PyInt_Check(x))) {
+        if ((sizeof(int) < sizeof(long))) {
+            __PYX_VERIFY_RETURN_INT(int, long, PyInt_AS_LONG(x))
+        } else {
+            long val = PyInt_AS_LONG(x);
+            if (is_unsigned && unlikely(val < 0)) {
+                goto raise_neg_overflow;
+            }
+            return (int) val;
+        }
+    }
+#endif
+    if (unlikely(!PyLong_Check(x))) {
+        int val;
+        PyObject *tmp = __Pyx_PyNumber_IntOrLong(x);
+        if (!tmp) return (int) -1;
+        val = __Pyx_PyInt_As_int(tmp);
+        Py_DECREF(tmp);
+        return val;
+    }
+    if (is_unsigned) {
+#if CYTHON_USE_PYLONG_INTERNALS
+        if (unlikely(__Pyx_PyLong_IsNeg(x))) {
+            goto raise_neg_overflow;
+        } else if (__Pyx_PyLong_IsCompact(x)) {
+            __PYX_VERIFY_RETURN_INT(int, __Pyx_compact_upylong, __Pyx_PyLong_CompactValueUnsigned(x))
+        } else {
+            const digit* digits = __Pyx_PyLong_Digits(x);
+            assert(__Pyx_PyLong_DigitCount(x) > 1);
+            switch (__Pyx_PyLong_DigitCount(x)) {
+                case 2:
+                    if ((8 * sizeof(int) > 1 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) >= 2 * PyLong_SHIFT)) {
+                            return (int) (((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
+                        }
+                    }
+                    break;
+                case 3:
+                    if ((8 * sizeof(int) > 2 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) >= 3 * PyLong_SHIFT)) {
+                            return (int) (((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
+                        }
+                    }
+                    break;
+                case 4:
+                    if ((8 * sizeof(int) > 3 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) >= 4 * PyLong_SHIFT)) {
+                            return (int) (((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
+                        }
+                    }
+                    break;
+            }
+        }
+#endif
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX < 0x030C00A7
+        if (unlikely(Py_SIZE(x) < 0)) {
+            goto raise_neg_overflow;
+        }
+#else
+        {
+            int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
+            if (unlikely(result < 0))
+                return (int) -1;
+            if (unlikely(result == 1))
+                goto raise_neg_overflow;
+        }
+#endif
+        if ((sizeof(int) <= sizeof(unsigned long))) {
+            __PYX_VERIFY_RETURN_INT_EXC(int, unsigned long, PyLong_AsUnsignedLong(x))
+#ifdef HAVE_LONG_LONG
+        } else if ((sizeof(int) <= sizeof(unsigned PY_LONG_LONG))) {
+            __PYX_VERIFY_RETURN_INT_EXC(int, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
+#endif
+        }
+    } else {
+#if CYTHON_USE_PYLONG_INTERNALS
+        if (__Pyx_PyLong_IsCompact(x)) {
+            __PYX_VERIFY_RETURN_INT(int, __Pyx_compact_pylong, __Pyx_PyLong_CompactValue(x))
+        } else {
+            const digit* digits = __Pyx_PyLong_Digits(x);
+            assert(__Pyx_PyLong_DigitCount(x) > 1);
+            switch (__Pyx_PyLong_SignedDigitCount(x)) {
+                case -2:
+                    if ((8 * sizeof(int) - 1 > 1 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) - 1 > 2 * PyLong_SHIFT)) {
+                            return (int) (((int)-1)*(((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case 2:
+                    if ((8 * sizeof(int) > 1 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) - 1 > 2 * PyLong_SHIFT)) {
+                            return (int) ((((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case -3:
+                    if ((8 * sizeof(int) - 1 > 2 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) - 1 > 3 * PyLong_SHIFT)) {
+                            return (int) (((int)-1)*(((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case 3:
+                    if ((8 * sizeof(int) > 2 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) - 1 > 3 * PyLong_SHIFT)) {
+                            return (int) ((((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case -4:
+                    if ((8 * sizeof(int) - 1 > 3 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) - 1 > 4 * PyLong_SHIFT)) {
+                            return (int) (((int)-1)*(((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case 4:
+                    if ((8 * sizeof(int) > 3 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) - 1 > 4 * PyLong_SHIFT)) {
+                            return (int) ((((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+            }
+        }
+#endif
+        if ((sizeof(int) <= sizeof(long))) {
+            __PYX_VERIFY_RETURN_INT_EXC(int, long, PyLong_AsLong(x))
+#ifdef HAVE_LONG_LONG
+        } else if ((sizeof(int) <= sizeof(PY_LONG_LONG))) {
+            __PYX_VERIFY_RETURN_INT_EXC(int, PY_LONG_LONG, PyLong_AsLongLong(x))
+#endif
+        }
+    }
+    {
+        int val;
+        int ret = -1;
+#if PY_VERSION_HEX >= 0x030d00A6 && !CYTHON_COMPILING_IN_LIMITED_API
+        Py_ssize_t bytes_copied = PyLong_AsNativeBytes(
+            x, &val, sizeof(val), Py_ASNATIVEBYTES_NATIVE_ENDIAN | (is_unsigned ? Py_ASNATIVEBYTES_UNSIGNED_BUFFER | Py_ASNATIVEBYTES_REJECT_NEGATIVE : 0));
+        if (unlikely(bytes_copied == -1)) {
+        } else if (unlikely(bytes_copied > (Py_ssize_t) sizeof(val))) {
+            goto raise_overflow;
+        } else {
+            ret = 0;
+        }
+#elif PY_VERSION_HEX < 0x030d0000 && !(CYTHON_COMPILING_IN_PYPY || CYTHON_COMPILING_IN_LIMITED_API) || defined(_PyLong_AsByteArray)
+        int one = 1; int is_little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&val;
+        ret = _PyLong_AsByteArray((PyLongObject *)x,
+                                    bytes, sizeof(val),
+                                    is_little, !is_unsigned);
+#else
+        PyObject *v;
+        PyObject *stepval = NULL, *mask = NULL, *shift = NULL;
+        int bits, remaining_bits, is_negative = 0;
+        int chunk_size = (sizeof(long) < 8) ? 30 : 62;
+        if (likely(PyLong_CheckExact(x))) {
+            v = __Pyx_NewRef(x);
+        } else {
+            v = PyNumber_Long(x);
+            if (unlikely(!v)) return (int) -1;
+            assert(PyLong_CheckExact(v));
+        }
+        {
+            int result = PyObject_RichCompareBool(v, Py_False, Py_LT);
+            if (unlikely(result < 0)) {
+                Py_DECREF(v);
+                return (int) -1;
+            }
+            is_negative = result == 1;
+        }
+        if (is_unsigned && unlikely(is_negative)) {
+            Py_DECREF(v);
+            goto raise_neg_overflow;
+        } else if (is_negative) {
+            stepval = PyNumber_Invert(v);
+            Py_DECREF(v);
+            if (unlikely(!stepval))
+                return (int) -1;
+        } else {
+            stepval = v;
+        }
+        v = NULL;
+        val = (int) 0;
+        mask = PyLong_FromLong((1L << chunk_size) - 1); if (unlikely(!mask)) goto done;
+        shift = PyLong_FromLong(chunk_size); if (unlikely(!shift)) goto done;
+        for (bits = 0; bits < (int) sizeof(int) * 8 - chunk_size; bits += chunk_size) {
+            PyObject *tmp, *digit;
+            long idigit;
+            digit = PyNumber_And(stepval, mask);
+            if (unlikely(!digit)) goto done;
+            idigit = PyLong_AsLong(digit);
+            Py_DECREF(digit);
+            if (unlikely(idigit < 0)) goto done;
+            val |= ((int) idigit) << bits;
+            tmp = PyNumber_Rshift(stepval, shift);
+            if (unlikely(!tmp)) goto done;
+            Py_DECREF(stepval); stepval = tmp;
+        }
+        Py_DECREF(shift); shift = NULL;
+        Py_DECREF(mask); mask = NULL;
+        {
+            long idigit = PyLong_AsLong(stepval);
+            if (unlikely(idigit < 0)) goto done;
+            remaining_bits = ((int) sizeof(int) * 8) - bits - (is_unsigned ? 0 : 1);
+            if (unlikely(idigit >= (1L << remaining_bits)))
+                goto raise_overflow;
+            val |= ((int) idigit) << bits;
+        }
+        if (!is_unsigned) {
+            if (unlikely(val & (((int) 1) << (sizeof(int) * 8 - 1))))
+                goto raise_overflow;
+            if (is_negative)
+                val = ~val;
+        }
+        ret = 0;
+    done:
+        Py_XDECREF(shift);
+        Py_XDECREF(mask);
+        Py_XDECREF(stepval);
+#endif
+        if (unlikely(ret))
+            return (int) -1;
+        return val;
+    }
+raise_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "value too large to convert to int");
+    return (int) -1;
+raise_neg_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "can't convert negative value to int");
+    return (int) -1;
 }
 
 /* CIntToPy */

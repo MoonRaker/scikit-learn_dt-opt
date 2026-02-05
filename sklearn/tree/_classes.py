@@ -144,11 +144,13 @@ class BaseDecisionTree(MultiOutputMixin, BaseEstimator, metaclass=ABCMeta):
         class_weight=None,
         ccp_alpha=0.0,
         monotonic_cst=None,
-        sensor_cost=[0.0,0.0],
-        time_cost=0.0,
-        depth_cost=0.0,
+        initial_cost=[0.0],
+        sensor_cost=[0.0],
+        depth_cost=[0.0],
+        measurement_cost=[0.0],
         cost_threshold=0.0,
         imp_threshold=0.0,
+        new_version_flag=False,
     ):
         self.criterion = criterion
         self.splitter = splitter
@@ -164,11 +166,14 @@ class BaseDecisionTree(MultiOutputMixin, BaseEstimator, metaclass=ABCMeta):
         self.ccp_alpha = ccp_alpha
         self.monotonic_cst = monotonic_cst
 
+        self.initial_cost = initial_cost
         self.sensor_cost = sensor_cost
-        self.time_cost = time_cost
         self.depth_cost = depth_cost
+        self.measurement_cost = measurement_cost
         self.cost_threshold = cost_threshold
         self.imp_threshold = imp_threshold
+
+        self.new_version_flag = new_version_flag
 
         # print('base')
 
@@ -258,6 +263,8 @@ class BaseDecisionTree(MultiOutputMixin, BaseEstimator, metaclass=ABCMeta):
         if isinstance(X, pd.DataFrame):
             types = X.columns.str.split(':', expand=True, n=2).to_numpy()
 
+            # print(types)
+
             sensor, depth, time = zip(*types)
             # print(sensor)
             # print(depth)
@@ -266,27 +273,41 @@ class BaseDecisionTree(MultiOutputMixin, BaseEstimator, metaclass=ABCMeta):
             sensor_set = list(set(sensor))
             idx_sensor = range(len(sensor_set))
             sensor_dict = dict(zip(sensor_set, idx_sensor))
+            # print(sensor_dict)
             sensor_map = np.vectorize(lambda x: sensor_dict.get(x, 99))
             sensor_types = sensor_map(sensor)
 
             depth_set = list(set(depth))
+            # print(depth_set)
             idx_depth = range(len(depth_set))
             depth_dict = dict(zip(depth_set, idx_depth))
+            # print(depth_dict)
             depth_map = np.vectorize(lambda x: depth_dict.get(x, 99))
-            depth_types = sensor_map(depth)
+            depth_types = depth_map(depth)
+            # print(depth_types)
+            # print(depth_dict[depth[0]])
 
             time_set = list(set(time))
+            # print(time_set)
             idx_time = range(len(time_set))
             time_dict = dict(zip(time_set, idx_time))
+            # print(time_dict)
             time_map = np.vectorize(lambda x: time_dict.get(x, 99))
-            time_types = sensor_map(time)
+            time_types = time_map(time)
+            # print(time_types)
+            # print(time_dict[time[0]])
 
         else:
             sensor_types = [0] * X.shape[0]
 
-        sensor_types = np.array(sensor_types).astype(np.int32)
-        depth_types = np.array(depth_types).astype(np.int32)
-        time_types = np.array(time_types).astype(np.int32)
+        # print(np.unique(sensor_types))
+        # print(np.unique(depth_types))
+        # print(np.unique(time_types))
+        # raise
+
+        sensor_types = np.array(sensor_types).astype(np.intp)
+        depth_types = np.array(depth_types).astype(np.intp)
+        time_types = np.array(time_types).astype(np.intp)
 
         # print(feature_types)
         # print(X)        
@@ -481,7 +502,10 @@ class BaseDecisionTree(MultiOutputMixin, BaseEstimator, metaclass=ABCMeta):
                 # *positive class*, all signs must be flipped.
                 monotonic_cst *= -1
 
+        self.initial_cost = np.array(self.initial_cost).astype(np.float64)
         self.sensor_cost = np.array(self.sensor_cost).astype(np.float64)
+        self.depth_cost = np.array(self.depth_cost).astype(np.float64)
+        self.measurement_cost = np.array(self.measurement_cost).astype(np.float64)
 
         # print(self.sensor_cost)
 
@@ -493,11 +517,13 @@ class BaseDecisionTree(MultiOutputMixin, BaseEstimator, metaclass=ABCMeta):
                 min_weight_leaf,
                 random_state,
                 monotonic_cst,
+                self.initial_cost,
                 self.sensor_cost,
-                self.time_cost,
                 self.depth_cost,
+                self.measurement_cost,
                 self.cost_threshold,
                 self.imp_threshold,
+                self.new_version_flag,
             )
 
         if is_classifier(self):
@@ -1402,11 +1428,13 @@ class DecisionTreeRegressor(RegressorMixin, BaseDecisionTree):
         min_impurity_decrease=0.0,
         ccp_alpha=0.0,
         monotonic_cst=None,
-        sensor_cost=[0.0,0.0],
-        time_cost=0.0,
-        depth_cost=0.0,
+        initial_cost=[0.0],
+        sensor_cost=[0.0],
+        depth_cost=[0.0],
+        measurement_cost=[0.0],
         cost_threshold=0.0,
         imp_threshold=0.0,
+        new_version_flag=False
     ):
         super().__init__(
             criterion=criterion,
@@ -1421,11 +1449,13 @@ class DecisionTreeRegressor(RegressorMixin, BaseDecisionTree):
             min_impurity_decrease=min_impurity_decrease,
             ccp_alpha=ccp_alpha,
             monotonic_cst=monotonic_cst,
+            initial_cost=initial_cost,
             sensor_cost=sensor_cost,
-            time_cost=time_cost,
             depth_cost=depth_cost,
+            measurement_cost=measurement_cost,
             cost_threshold=cost_threshold,
-            imp_threshold=imp_threshold,            
+            imp_threshold=imp_threshold,
+            new_version_flag=new_version_flag,
         )
 
     @_fit_context(prefer_skip_nested_validation=True)

@@ -593,7 +593,7 @@ cdef inline int node_split_best(
 
     # cdef float64_t node_improvement
 
-    tree_efficient_cost_flag = True
+    tree_efficient_cost_flag = False
     best_cost_flag = True
 
     # Resize the array
@@ -737,8 +737,8 @@ cdef inline int node_split_best(
 
                             copy_splitrecord(&current_split, &best_split)
 
-            if current_proxy_improvement < 0:
-                continue
+            # if current_proxy_improvement < 0:
+            #     continue
 
             num_nodes_valid += 1
 
@@ -1230,8 +1230,8 @@ cdef inline int node_split_best(
 
                             copy_splitrecord(&current_split, &best_split)
 
-            if best_split.improvement < 0:
-                continue
+            # if best_split.improvement < 0:
+            #     continue
 
             num_nodes_valid += 1
 
@@ -1318,184 +1318,184 @@ cdef inline int node_split_best(
                 for j in range(num_vars):
                     obj_arr[i][j] = obj_arr_temp[i][j]
 
-        ### Cost Objective Function
-        inplace_sort_2d_array_by_two_columns(obj_arr, 1, 0)
+            ### Cost Objective Function
+            inplace_sort_2d_array_by_two_columns(obj_arr, 1, 0)
 
-        # max_ind = find_max_in_2d_array(obj_arr,0)
-        # min_ind = find_min_in_2d_array(obj_arr,0)
-        # best_ind = max_ind
-        n_ind = -1
+            # max_ind = find_max_in_2d_array(obj_arr,0)
+            # min_ind = find_min_in_2d_array(obj_arr,0)
+            # best_ind = max_ind
+            n_ind = -1
 
-        max_cost_ind = find_max_in_2d_array(obj_arr,1)
-        min_cost_ind = find_min_in_2d_array(obj_arr,1)
-        max_imp_ind = find_max_in_2d_array(obj_arr,0)
-        min_imp_ind = find_min_in_2d_array(obj_arr,0)
-        best_ind = max_imp_ind
-
-        cost_range = (obj_arr[max_cost_ind][1] - obj_arr[min_cost_ind][1])
-        imp_range = (obj_arr[max_imp_ind][0] - obj_arr[min_imp_ind][0])
-
-        # printf('best_cost_flag\n')
-
-        for i in range(num_nodes_valid):
-        
-            if cost_range == 0:
-                cost_var = 0.0
-            else:
-                cost_var = (cost_threshold) * ((obj_arr[i][1] - obj_arr[min_cost_ind][1]) / \
-                   cost_range)
-            
-            if imp_range == 0:
-                imp_var = 0.0
-            else:
-                imp_var = (1.0 - cost_threshold) * ((obj_arr[i][0] - obj_arr[min_imp_ind][0]) / \
-                   imp_range)
-
-            obj_arr[i][3] = cost_var + imp_var
-
-
-            # sprintf(buffer, '%f', obj_arr[i][3])
-            # printf('obj_val:%s\n', buffer)
-            
-
-        # inplace_sort_2d_array_by_one_column(obj_arr, 3)
-        inplace_sort_2d_array_by_two_columns(obj_arr, 3, 0)
-        max_imp_ind = find_max_in_2d_array(obj_arr,0)
-
-        best_ind = 0
-        if obj_arr[best_ind][3] == 0:
+            max_cost_ind = find_max_in_2d_array(obj_arr,1)
+            min_cost_ind = find_min_in_2d_array(obj_arr,1)
+            max_imp_ind = find_max_in_2d_array(obj_arr,0)
+            min_imp_ind = find_min_in_2d_array(obj_arr,0)
             best_ind = max_imp_ind
 
-        # sprintf(buffer, '%d', best_ind)
-        # printf('best_ind:%s\n', buffer)
+            cost_range = (obj_arr[max_cost_ind][1] - obj_arr[min_cost_ind][1])
+            imp_range = (obj_arr[max_imp_ind][0] - obj_arr[min_imp_ind][0])
 
-        # sprintf(buffer, '%f', obj_arr[best_ind][3])
-        # printf('obj_val:%s\n', buffer)
+            # printf('best_cost_flag\n')
 
-        if False:
-            # printf("best_cost")
-            # sprintf(buffer, "%d",max_ind)
-            # printf("max_ind: %s\n", buffer)
-
-            # sprintf(buffer, "%d",n_features)
-            # printf("n_feat: %s\n", buffer)
-
-            # while n_ind < <int>n_features - 1:
-            while n_ind < num_nodes_valid - 1:            
-                n_ind += 1
-
-                # if (feature == _TREE_LEAF) or (feature == _TREE_UNDEFINED):
-                #     continue
-
-                # diff = fabs(obj_arr[max_ind][0] - obj_arr[n_ind][0]) / \
-                #     (obj_arr[max_ind][0] - obj_arr[min_ind][0])
-
-                diff = fabs(obj_arr[n_ind][0] - obj_arr[min_ind][0]) / \
-                    (obj_arr[max_ind][0] - obj_arr[min_ind][0])
-
-
-                if (obj_arr[max_ind][0] - obj_arr[min_ind][0]) == 0:
-                    diff = 0.0                
-
-                # sprintf(buffer, "%f",obj_arr[n_ind][0])
-                # printf("imp: %s\n", buffer)
-                # # fflush(stdout)
-
-                # sprintf(buffer, "%f",diff)
-                # printf("diff: %s\n", buffer)
-                # # fflush(stdout)
-
-                # sprintf(buffer, "%f",cost_threshold)
-                # printf("cost_threshold: %s\n", buffer)
-                # # fflush(stdout)
-
-                if diff >= cost_threshold:
-                    best_ind = n_ind
-                    break
-
-        feature_ind = <int>obj_arr[best_ind][2]
-        best_split = split_list2[feature_ind]
-
-        # sprintf(buffer, "%d",n_ind)
-        # printf("n_ind: %s\n", buffer)    
-
-        # best_split.cost = obj_arr[best_ind][1]
-
-        # for r_ind in [best_ind, max_ind]:
-        if False:
-            for c_ind in range(3):
-                if c_ind < 2:
-                    sprintf(buffer, "%f",obj_arr[max_ind][c_ind])
-                    printf("%s\n", buffer)
-                if c_ind == 2:
-                    feature_ind = <int>obj_arr[max_ind][c_ind]
-                    current_split = split_list2[feature_ind]
-                    # sprintf(buffer, "%d",current_split.feature)
-                    sprintf(buffer, "%d",max_ind)
-                    printf("%s\n", buffer)
-
-            for c_ind in range(3):
-                if c_ind < 2:
-                    sprintf(buffer, "%f",obj_arr[best_ind][c_ind])
-                    printf("%s\n", buffer)
-                if c_ind == 2:
-                    feature_ind = <int>obj_arr[best_ind][c_ind]
-                    current_split = split_list2[feature_ind]
-                    # sprintf(buffer, "%d",current_split.feature)
-                    sprintf(buffer, "%d",best_ind)
-                    printf("%s\n", buffer)
-
-            # for i in range(2):
-        if False:
-            min_ind = find_min_in_2d_array(obj_arr,0)
-            sprintf(buffer, "%f",obj_arr[min_ind][0])
-            sprintf(buffer2, "%f",obj_arr[min_ind][1])
-            # feature_ind = <int>obj_arr[min_ind][2]
-            # current_split = split_list2[feature_ind]
-            # sprintf(buffer3, "%d",current_split.feature)
-            sprintf(buffer3, "%d",min_ind)
-            printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+            for i in range(num_nodes_valid):
             
-            max_ind = find_max_in_2d_array(obj_arr,0)
-            sprintf(buffer, "%f",obj_arr[max_ind][0])
-            sprintf(buffer2, "%f",obj_arr[max_ind][1])        
-            sprintf(buffer3, "%d",max_ind)
-            printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+                if cost_range == 0:
+                    cost_var = 0.0
+                else:
+                    cost_var = (cost_threshold) * ((obj_arr[i][1] - obj_arr[min_cost_ind][1]) / \
+                       cost_range)
+                
+                if imp_range == 0:
+                    imp_var = 0.0
+                else:
+                    imp_var = (1.0 - cost_threshold) * ((obj_arr[i][0] - obj_arr[min_imp_ind][0]) / \
+                       imp_range)
 
-            sprintf(buffer, "%f",obj_arr[max_ind][0] - obj_arr[min_ind][0])
-            printf("imp range:%s\n", buffer)
+                obj_arr[i][3] = cost_var + imp_var
 
-            # min_ind = find_min_in_2d_array(obj_arr,1)
-            min_ind = <int>(obj_arr.size() - 1)
-            sprintf(buffer, "%f",obj_arr[min_ind][0])
-            sprintf(buffer2, "%f",obj_arr[min_ind][1])
-            sprintf(buffer3, "%d",min_ind)
-            printf("%s,%s,%s\n", buffer, buffer2, buffer3)
-            
-            # max_ind = find_max_in_2d_array(obj_arr,1)
-            max_ind = 0
-            sprintf(buffer, "%f",obj_arr[max_ind][0])
-            sprintf(buffer2, "%f",obj_arr[max_ind][1])
-            sprintf(buffer3, "%d",max_ind)
-            printf("%s,%s,%s\n", buffer, buffer2, buffer3)
-            printf("\n") 
 
-            sprintf(buffer, "%d",best_split.feature)
-            printf("feature:%s\n", buffer)
-            sprintf(buffer, "%d",best_split.pos)
-            printf("pos:%s\n", buffer)
-            sprintf(buffer, "%d",best_split.n_missing)
-            printf("n_missing:%s\n", buffer)
-            sprintf(buffer, "%f",best_split.improvement)
-            printf("improvement:%s\n", buffer)
-            sprintf(buffer, "%f",best_split.threshold)
-            printf("threshold:%s\n", buffer)
-            sprintf(buffer, "%f",best_split.cost)
-            printf("cost:%s\n", buffer)
-            sprintf(buffer, "%f",best_split.impurity_left)
-            printf("impurity_left:%s\n", buffer)
-            sprintf(buffer, "%f",best_split.impurity_right)
-            printf("impurity_right:%s\n", buffer)
+                # sprintf(buffer, '%f', obj_arr[i][3])
+                # printf('obj_val:%s\n', buffer)
+                
+
+            # inplace_sort_2d_array_by_one_column(obj_arr, 3)
+            inplace_sort_2d_array_by_two_columns(obj_arr, 3, 0)
+            max_imp_ind = find_max_in_2d_array(obj_arr,0)
+
+            best_ind = 0
+            if obj_arr[best_ind][3] == 0:
+                best_ind = max_imp_ind
+
+            # sprintf(buffer, '%d', best_ind)
+            # printf('best_ind:%s\n', buffer)
+
+            # sprintf(buffer, '%f', obj_arr[best_ind][3])
+            # printf('obj_val:%s\n', buffer)
+
+            if False:
+                # printf("best_cost")
+                # sprintf(buffer, "%d",max_ind)
+                # printf("max_ind: %s\n", buffer)
+
+                # sprintf(buffer, "%d",n_features)
+                # printf("n_feat: %s\n", buffer)
+
+                # while n_ind < <int>n_features - 1:
+                while n_ind < num_nodes_valid - 1:            
+                    n_ind += 1
+
+                    # if (feature == _TREE_LEAF) or (feature == _TREE_UNDEFINED):
+                    #     continue
+
+                    # diff = fabs(obj_arr[max_ind][0] - obj_arr[n_ind][0]) / \
+                    #     (obj_arr[max_ind][0] - obj_arr[min_ind][0])
+
+                    diff = fabs(obj_arr[n_ind][0] - obj_arr[min_ind][0]) / \
+                        (obj_arr[max_ind][0] - obj_arr[min_ind][0])
+
+
+                    if (obj_arr[max_ind][0] - obj_arr[min_ind][0]) == 0:
+                        diff = 0.0                
+
+                    # sprintf(buffer, "%f",obj_arr[n_ind][0])
+                    # printf("imp: %s\n", buffer)
+                    # # fflush(stdout)
+
+                    # sprintf(buffer, "%f",diff)
+                    # printf("diff: %s\n", buffer)
+                    # # fflush(stdout)
+
+                    # sprintf(buffer, "%f",cost_threshold)
+                    # printf("cost_threshold: %s\n", buffer)
+                    # # fflush(stdout)
+
+                    if diff >= cost_threshold:
+                        best_ind = n_ind
+                        break
+
+            feature_ind = <int>obj_arr[best_ind][2]
+            best_split = split_list2[feature_ind]
+
+            # sprintf(buffer, "%d",n_ind)
+            # printf("n_ind: %s\n", buffer)    
+
+            # best_split.cost = obj_arr[best_ind][1]
+
+            # for r_ind in [best_ind, max_ind]:
+            if False:
+                for c_ind in range(3):
+                    if c_ind < 2:
+                        sprintf(buffer, "%f",obj_arr[max_ind][c_ind])
+                        printf("%s\n", buffer)
+                    if c_ind == 2:
+                        feature_ind = <int>obj_arr[max_ind][c_ind]
+                        current_split = split_list2[feature_ind]
+                        # sprintf(buffer, "%d",current_split.feature)
+                        sprintf(buffer, "%d",max_ind)
+                        printf("%s\n", buffer)
+
+                for c_ind in range(3):
+                    if c_ind < 2:
+                        sprintf(buffer, "%f",obj_arr[best_ind][c_ind])
+                        printf("%s\n", buffer)
+                    if c_ind == 2:
+                        feature_ind = <int>obj_arr[best_ind][c_ind]
+                        current_split = split_list2[feature_ind]
+                        # sprintf(buffer, "%d",current_split.feature)
+                        sprintf(buffer, "%d",best_ind)
+                        printf("%s\n", buffer)
+
+                # for i in range(2):
+            if False:
+                min_ind = find_min_in_2d_array(obj_arr,0)
+                sprintf(buffer, "%f",obj_arr[min_ind][0])
+                sprintf(buffer2, "%f",obj_arr[min_ind][1])
+                # feature_ind = <int>obj_arr[min_ind][2]
+                # current_split = split_list2[feature_ind]
+                # sprintf(buffer3, "%d",current_split.feature)
+                sprintf(buffer3, "%d",min_ind)
+                printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+                
+                max_ind = find_max_in_2d_array(obj_arr,0)
+                sprintf(buffer, "%f",obj_arr[max_ind][0])
+                sprintf(buffer2, "%f",obj_arr[max_ind][1])        
+                sprintf(buffer3, "%d",max_ind)
+                printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+
+                sprintf(buffer, "%f",obj_arr[max_ind][0] - obj_arr[min_ind][0])
+                printf("imp range:%s\n", buffer)
+
+                # min_ind = find_min_in_2d_array(obj_arr,1)
+                min_ind = <int>(obj_arr.size() - 1)
+                sprintf(buffer, "%f",obj_arr[min_ind][0])
+                sprintf(buffer2, "%f",obj_arr[min_ind][1])
+                sprintf(buffer3, "%d",min_ind)
+                printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+                
+                # max_ind = find_max_in_2d_array(obj_arr,1)
+                max_ind = 0
+                sprintf(buffer, "%f",obj_arr[max_ind][0])
+                sprintf(buffer2, "%f",obj_arr[max_ind][1])
+                sprintf(buffer3, "%d",max_ind)
+                printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+                printf("\n") 
+
+                sprintf(buffer, "%d",best_split.feature)
+                printf("feature:%s\n", buffer)
+                sprintf(buffer, "%d",best_split.pos)
+                printf("pos:%s\n", buffer)
+                sprintf(buffer, "%d",best_split.n_missing)
+                printf("n_missing:%s\n", buffer)
+                sprintf(buffer, "%f",best_split.improvement)
+                printf("improvement:%s\n", buffer)
+                sprintf(buffer, "%f",best_split.threshold)
+                printf("threshold:%s\n", buffer)
+                sprintf(buffer, "%f",best_split.cost)
+                printf("cost:%s\n", buffer)
+                sprintf(buffer, "%f",best_split.impurity_left)
+                printf("impurity_left:%s\n", buffer)
+                sprintf(buffer, "%f",best_split.impurity_right)
+                printf("impurity_right:%s\n", buffer)
    
     # Reorganize into samples[start:best_split.pos] + samples[best_split.pos:end]
     if best_split.pos < end:

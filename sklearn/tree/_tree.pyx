@@ -94,9 +94,9 @@ cdef class TreeBuilder:
         const float64_t[:, ::1] y,
         const float64_t[:] sample_weight=None,
         const unsigned char[::1] missing_values_in_feature_mask=None,
-        int32_t[:] sensor_types=None,
-        int32_t[:] depth_types=None,
-        int32_t[:] time_types=None,
+        intp_t[:] sensor_types=None,
+        intp_t[:] depth_types=None,
+        intp_t[:] time_types=None,
     ):
         """Build a decision tree from the training set (X, y)."""
         pass
@@ -173,9 +173,9 @@ cdef class DepthFirstTreeBuilder(TreeBuilder):
         const float64_t[:, ::1] y,
         const float64_t[:] sample_weight=None,
         const unsigned char[::1] missing_values_in_feature_mask=None,
-        int32_t[:] sensor_types=None,
-        int32_t[:] depth_types=None,
-        int32_t[:] time_types=None,
+        intp_t[:] sensor_types=None,
+        intp_t[:] depth_types=None,
+        intp_t[:] time_types=None,
     ):
         """Build a decision tree from the training set (X, y)."""
 
@@ -444,9 +444,9 @@ cdef class BestFirstTreeBuilder(TreeBuilder):
         const float64_t[:, ::1] y,
         const float64_t[:] sample_weight=None,
         const unsigned char[::1] missing_values_in_feature_mask=None,
-        int32_t[:] sensor_types=None,
-        int32_t[:] depth_types=None,
-        int32_t[:] time_types=None,
+        intp_t[:] sensor_types=None,
+        intp_t[:] depth_types=None,
+        intp_t[:] time_types=None,
     ):
         """Build a decision tree from the training set (X, y)."""
 
@@ -628,9 +628,9 @@ cdef class BestFirstTreeBuilder(TreeBuilder):
         float64_t lower_bound,
         float64_t upper_bound,
         FrontierRecord* res,
-        int32_t[:] sensor_types,
-        int32_t[:] depth_types,
-        int32_t[:] time_types,
+        intp_t[:] sensor_types,
+        intp_t[:] depth_types,
+        intp_t[:] time_types,
     ) except -1 nogil:
         """Adds node w/ partition ``[start, end)`` to the frontier. """
         cdef SplitRecord split
