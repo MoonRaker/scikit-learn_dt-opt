@@ -15,6 +15,8 @@ cimport numpy as cnp
 
 from ._criterion cimport Criterion
 
+from libc.stdlib cimport malloc, free
+
 from libc.stdlib cimport qsort
 from libc.string cimport memcpy
 from libc.math cimport isnan
@@ -29,6 +31,14 @@ from ._utils cimport rand_int
 from ._utils cimport rand_uniform
 from ._utils cimport RAND_R_MAX
 
+
+from ._tree cimport Tree, Node
+from libcpp.vector cimport vector
+from libc.stdio cimport printf,sprintf
+from libc.math cimport fabs
+
+# from libcpp.algorithm cimport sort as sort_c
+
 cnp.import_array()
 
 cdef float64_t INFINITY = np.inf
@@ -40,6 +50,171 @@ cdef float32_t FEATURE_THRESHOLD = 1e-7
 # in SparsePartitioner
 cdef float32_t EXTRACT_NNZ_SWITCH = 0.1
 
+TREE_LEAF = -1
+TREE_UNDEFINED = -2
+cdef intp_t _TREE_LEAF = TREE_LEAF
+cdef intp_t _TREE_UNDEFINED = TREE_UNDEFINED
+
+# cdef extern from "stdio.h":
+#     FILE *fopen(const char *filename, const char *mode)
+#     int fprintf(FILE *stream, const char *format, ...)
+#     int fclose(FILE *stream)
+
+# cdef FILE *file = fopen("log.txt", "w")
+# with nogil:
+#     fprintf(file, "Logging from nogil\n")
+# fclose(file)
+
+cdef void copy_splitrecord(const SplitRecord* src, SplitRecord* dst) noexcept nogil:
+    memcpy(dst, src, sizeof(SplitRecord))
+
+# cdef void copy_splitrecord(const SplitRecord* src, SplitRecord* dst) noexcept nogil:
+#     dst.feature = src.feature
+#     dst.pos = src.pos
+#     dst.threshold = src.threshold
+#     dst.improvement = src.improvement
+#     dst.impurity_left = src.impurity_left
+#     dst.impurity_right = src.impurity_right
+#     dst.lower_bound = src.lower_bound
+#     dst.upper_bound = src.upper_bound
+#     dst.missing_go_to_left = src.missing_go_to_left
+#     dst.n_missing = src.n_missing
+#     dst.cost = src.cost
+
+# cdef inline float64_t abs_float(float64_t x) noexcept nogil:
+#     if x < 0:
+#         return -x
+#     else:
+#         return x
+
+cdef inline void _add_to_split_list(
+    SplitRecord rec,
+    vector[SplitRecord] &split_list) noexcept nogil:
+    """Adds record `rec` to the priority queue `split_list`."""
+    split_list.push_back(rec)
+
+cdef inline int find_max_in_2d_array(vector[vector[float64_t]]  arr, int col) noexcept nogil:
+    cdef int rows = arr.size()
+    # cdef int col = 0
+    cdef int max_ind = rows - 1
+    cdef float64_t max_val = arr[max_ind][col]
+    cdef int i, row
+
+    # Iterate through the array to find the maximum value
+    for i in range(rows):
+        row = rows - i - 1
+        # row = i
+        if arr[row][col] >= max_val:
+            max_val = arr[row][col]
+            max_ind = row
+
+    return max_ind
+
+cdef inline int find_min_in_2d_array(vector[vector[float64_t]]  arr, int col) noexcept nogil:
+    cdef int rows = arr.size()
+    # cdef int col = 0
+    cdef int min_ind = 0
+    cdef float64_t min_val = arr[min_ind][col]
+    cdef int i
+
+    # Iterate through the array to find the maximum value
+    for i in range(rows):
+        row = i
+        if arr[row][col] <= min_val:
+            min_val = arr[row][col]
+            min_ind = row
+            # break
+
+    return min_ind
+
+# cdef inline int compare_rows(vector[float64_t] row1, vector[float64_t] row2, int col1, int col2) noexcept nogil:
+#     if row1[col1] > row2[col1]:
+#         return -1
+#     elif row1[col1] < row2[col1]:
+#         return 1
+#     elif row1[col2] > row2[col2]:
+#         return -1
+#     elif row1[col2] < row2[col2]:
+#         return 1
+#     return 0
+
+# cdef class Compare:
+#     cdef int col1
+#     cdef int col2
+
+#     def __init__(self, int col1, int col2):
+#         self.col1 = col1
+#         self.col2 = col2
+
+#     cdef int operator()(const vector[float64_t] &row1, const vector[float64_t] &row2) noexcept nogil:
+#         """
+#         Compare two rows by col1 and col2 in descending order.
+#         """
+#         cdef float64_t value1_col1 = row1[self.col1]
+#         cdef float64_t value2_col1 = row2[self.col1]
+#         cdef float64_t value1_col2 = row1[self.col2]
+#         cdef float64_t value2_col2 = row2[self.col2]
+#         # Compare col1
+#         if value1_col1 > value2_col1:
+#             return -1
+#         elif value1_col1 < value2_col1:
+#             return 1
+#         # Compare col2 if col1 is equal
+#         if value1_col2 > value2_col2:
+#             return -1
+#         elif value1_col2 < value2_col2:
+#             return 1
+#         return 0     
+
+# cdef inline void inplace_sort_2d_array_by_two_columns(vector[vector[float64_t]] &arr, int col1, int col2) noexcept nogil:
+#     cdef Compare cmp = Compare(col1, col2)
+#     sort_c(arr.begin(), arr.end(), cmp)
+    # sort_c(arr.begin(), arr.end(), lambda row1, row2: compare_rows(row1, row2, col1, col2))
+
+cdef inline void inplace_sort_2d_array_by_two_columns(vector[vector[float64_t]] &arr, \
+    int col1, int col2) noexcept nogil:
+    cdef int i, j, k, row
+    cdef int rows = arr.size()
+    cdef int cols = arr[0].size()
+    cdef float64_t tmp
+
+    for i in range(rows - 1):
+        for j in range(rows - i - 1):
+            row = j
+            if (arr[row][col1] < arr[row + 1][col1]) or \
+               ((arr[row][col1] == arr[row + 1][col1]) and (arr[row][col2] < arr[row + 1][col2])):
+                # Swap rows
+                for k in range(cols):
+                    tmp = arr[row][k]
+                    arr[row][k] = arr[row + 1][k]
+                    arr[row + 1][k] = tmp
+
+cdef inline void inplace_sort_2d_array_by_one_column(vector[vector[float64_t]] &arr, \
+    int col1) noexcept nogil:
+    cdef int i, j, k, row
+    cdef int rows = arr.size()
+    cdef int cols = arr[0].size()
+    cdef float64_t tmp
+
+    for i in range(rows - 1):
+        for j in range(rows - i - 1):
+            row = j
+            if (arr[row][col1] < arr[row + 1][col1]):
+                # Swap rows
+                for k in range(cols):
+                    tmp = arr[row][k]
+                    arr[row][k] = arr[row + 1][k]
+                    arr[row + 1][k] = tmp
+
+cdef inline void set_2d_array_to_zero(vector[vector[float64_t]] &arr) noexcept nogil:
+    cdef int i, j
+    cdef int rows = arr.size()
+    cdef int cols = arr[0].size()
+
+    for i in range(rows):
+        for j in range(cols):
+            arr[i][j] = 0.0
+
 cdef inline void _init_split(SplitRecord* self, intp_t start_pos) noexcept nogil:
     self.impurity_left = INFINITY
     self.impurity_right = INFINITY
@@ -49,6 +224,7 @@ cdef inline void _init_split(SplitRecord* self, intp_t start_pos) noexcept nogil
     self.improvement = -INFINITY
     self.missing_go_to_left = False
     self.n_missing = 0
+    self.cost = 0.
 
 cdef class Splitter:
     """Abstract splitter class.
@@ -65,6 +241,11 @@ cdef class Splitter:
         float64_t min_weight_leaf,
         object random_state,
         const cnp.int8_t[:] monotonic_cst,
+        float64_t[:] sensor_cost,
+        float64_t time_cost,
+        float64_t depth_cost,
+        float64_t cost_threshold,
+        float64_t imp_threshold,
     ):
         """
         Parameters
@@ -105,6 +286,12 @@ cdef class Splitter:
         self.monotonic_cst = monotonic_cst
         self.with_monotonic_cst = monotonic_cst is not None
 
+        self.sensor_cost = sensor_cost
+        self.time_cost = time_cost
+        self.depth_cost = depth_cost
+        self.cost_threshold = cost_threshold
+        self.imp_threshold = imp_threshold
+
     def __getstate__(self):
         return {}
 
@@ -117,7 +304,12 @@ cdef class Splitter:
                              self.min_samples_leaf,
                              self.min_weight_leaf,
                              self.random_state,
-                             self.monotonic_cst), self.__getstate__())
+                             self.monotonic_cst,
+                             self.sensor_cost,
+                             self.time_cost,
+                             self.depth_cost,
+                             self.cost_threshold,
+                             self.imp_threshold), self.__getstate__())
 
     cdef int init(
         self,
@@ -236,6 +428,10 @@ cdef class Splitter:
         intp_t* n_constant_features,
         float64_t lower_bound,
         float64_t upper_bound,
+        Tree tree,
+        int32_t[:] sensor_types,
+        int32_t[:] depth_types,
+        int32_t[:] time_types,        
     ) except -1 nogil:
 
         """Find the best split on node samples[start:end].
@@ -308,6 +504,10 @@ cdef inline int node_split_best(
     const cnp.int8_t[:] monotonic_cst,
     float64_t lower_bound,
     float64_t upper_bound,
+    Tree tree,
+    int32_t[:] sensor_types,
+    int32_t[:] depth_types,
+    int32_t[:] time_types,    
 ) except -1 nogil:
     """Find the best split on node samples[start:end]
 
@@ -353,90 +553,100 @@ cdef inline int node_split_best(
     # n_total_constants = n_known_constants + n_found_constants
     cdef intp_t n_total_constants = n_known_constants
 
+    cdef Node* node
+    cdef Node* nodes = tree.nodes
+    cdef intp_t node_count = tree.node_count
+    cdef float64_t[:] sensor_cost = splitter.sensor_cost
+    cdef float64_t time_cost = splitter.time_cost
+    cdef float64_t depth_cost = splitter.depth_cost
+    cdef float64_t current_cost
+    cdef float64_t diff = INFINITY
+    cdef float64_t cost_threshold = splitter.cost_threshold
+    cdef float64_t imp_threshold = splitter.imp_threshold
+    cdef intp_t feature
+    cdef int32_t sensor_n, depth_n, time_n
+    cdef int32_t sensor_f, depth_f, time_f
+    cdef int max_ind, min_ind
+    cdef int feature_ind, best_ind
+    cdef int n_ind, ind, r_ind, c_ind
+    cdef int node_id, node_id_temp
+    cdef int num_nodes_valid = 0
+    # cdef boolean best_flag
+    cdef vector[vector[float64_t]] obj_arr
+    # cdef vector[vector[float64_t]] obj_arr2
+    cdef vector[vector[float64_t]] obj_arr_temp
+    cdef vector[SplitRecord] split_list1
+    cdef vector[SplitRecord] split_list2
+    cdef char buffer[100]
+    cdef char buffer2[100]
+    cdef char buffer3[100]
+
+    cdef int max_cost_ind, min_cost_ind
+    cdef int max_imp_ind, min_imp_ind
+
+    cdef float64_t cost_var, imp_var
+    cdef float64_t cost_range, imp_range
+
+    cdef int num_vars = 4
+
+    cdef float64_t sq_sum_impurity = INFINITY
+
+    # cdef float64_t node_improvement
+
+    tree_efficient_cost_flag = False
+    best_cost_flag = True
+
+    # Resize the array
+    obj_arr.resize(n_features)
+    for i in range(n_features):
+        obj_arr[i].resize(num_vars)
+
+    obj_arr_temp.resize(n_features)
+    for i in range(n_features):
+        obj_arr_temp[i].resize(num_vars)        
+
     _init_split(&best_split, end)
+    _init_split(&current_split, end)
 
     partitioner.init_node_split(start, end)
 
-    # Sample up to max_features without replacement using a
-    # Fisher-Yates-based algorithm (using the local variables `f_i` and
-    # `f_j` to compute a permutation of the `features` array).
-    #
-    # Skip the CPU intensive evaluation of the impurity criterion for
-    # features that were already detected as constant (hence not suitable
-    # for good splitting) by ancestor nodes and save the information on
-    # newly discovered constant features to spare computation on descendant
-    # nodes.
-    while (f_i > n_total_constants and  # Stop early if remaining features
-                                        # are constant
-            (n_visited_features < max_features or
-             # At least one drawn features must be non constant
-             n_visited_features <= n_found_constants + n_drawn_constants)):
+    if tree_efficient_cost_flag and (node_count > 0):
 
-        n_visited_features += 1
+        obj_arr_temp.resize(node_count)
+        for i in range(node_count):
+            obj_arr_temp[i].resize(num_vars)
 
-        # Loop invariant: elements of features in
-        # - [:n_drawn_constant[ holds drawn and known constant features;
-        # - [n_drawn_constant:n_known_constant[ holds known constant
-        #   features that haven't been drawn yet;
-        # - [n_known_constant:n_total_constant[ holds newly found constant
-        #   features;
-        # - [n_total_constant:f_i[ holds features that haven't been drawn
-        #   yet and aren't constant apriori.
-        # - [f_i:n_features[ holds features that have been drawn
-        #   and aren't constant.
+        # sprintf(buffer, "%d",node_count)
+        # printf("node_count: %s\n", buffer)             
 
-        # Draw a feature at random
-        f_j = rand_int(n_drawn_constants, f_i - n_found_constants,
-                       random_state)
+        # doesn't incorporate has_missing
+        for node_id in range(node_count):
+            ind = node_id
+            node = &nodes[ind]
+            feature = node.feature
 
-        if f_j < n_known_constants:
-            # f_j in the interval [n_drawn_constants, n_known_constants[
-            features[n_drawn_constants], features[f_j] = features[f_j], features[n_drawn_constants]
+            best_proxy_improvement = -INFINITY
 
-            n_drawn_constants += 1
-            continue
+            if (feature == _TREE_LEAF) or (feature == _TREE_UNDEFINED):
+                continue
 
-        # f_j in the interval [n_known_constants, f_i - n_found_constants[
-        f_j += n_found_constants
-        # f_j in the interval [n_total_constants, f_i[
-        current_split.feature = features[f_j]
-        partitioner.sort_samples_and_feature_values(current_split.feature)
-        n_missing = partitioner.n_missing
-        end_non_missing = end - n_missing
 
-        if (
-            # All values for this feature are missing, or
-            end_non_missing == start or
-            # This feature is considered constant (max - min <= FEATURE_THRESHOLD)
-            feature_values[end_non_missing - 1] <= feature_values[start] + FEATURE_THRESHOLD
-        ):
-            # We consider this feature constant in this case.
-            # Since finding a split among constant feature is not valuable,
-            # we do not consider this feature for splitting.
-            features[f_j], features[n_total_constants] = features[n_total_constants], features[f_j]
+            # sprintf(buffer, "%d",feature)
+            # printf("feature:%s\n", buffer)
 
-            n_found_constants += 1
-            n_total_constants += 1
-            continue
+            # sprintf(buffer, "%d",feature)
+            # printf("feature: %s\n", buffer)             
 
-        f_i -= 1
-        features[f_i], features[f_j] = features[f_j], features[f_i]
-        has_missing = n_missing != 0
-        criterion.init_missing(n_missing)  # initialize even when n_missing == 0
+            current_split.feature = feature
+            partitioner.sort_samples_and_feature_values(current_split.feature)
+            n_missing = partitioner.n_missing
+            end_non_missing = end - n_missing
 
-        # Evaluate all splits
-
-        # If there are missing values, then we search twice for the most optimal split.
-        # The first search will have all the missing values going to the right node.
-        # The second search will have all the missing values going to the left node.
-        # If there are no missing values, then we search only once for the most
-        # optimal split.
-        n_searches = 2 if has_missing else 1
-
-        for i in range(n_searches):
-            missing_go_to_left = i == 1
+            has_missing = n_missing != 0
+            criterion.init_missing(n_missing)  # initialize even when n_missing == 0
+            missing_go_to_left = False
             criterion.missing_go_to_left = missing_go_to_left
-            criterion.reset()
+            criterion.reset()           
 
             p = start
 
@@ -460,24 +670,15 @@ cdef inline int node_split_best(
                 current_split.pos = p
                 criterion.update(current_split.pos)
 
-                # Reject if monotonicity constraints are not satisfied
-                if (
-                    with_monotonic_cst and
-                    monotonic_cst[current_split.feature] != 0 and
-                    not criterion.check_monotonicity(
-                        monotonic_cst[current_split.feature],
-                        lower_bound,
-                        upper_bound,
-                    )
-                ):
-                    continue
-
                 # Reject if min_weight_leaf is not satisfied
                 if ((criterion.weighted_n_left < min_weight_leaf) or
                         (criterion.weighted_n_right < min_weight_leaf)):
                     continue
 
                 current_proxy_improvement = criterion.proxy_impurity_improvement()
+
+                # sprintf(buffer, "%d",p)
+                # printf("pos: %s\n", buffer)                 
 
                 if current_proxy_improvement > best_proxy_improvement:
                     best_proxy_improvement = current_proxy_improvement
@@ -499,31 +700,804 @@ cdef inline int node_split_best(
                     else:
                         current_split.missing_go_to_left = missing_go_to_left
 
-                    best_split = current_split  # copy
+                    current_split.improvement = best_proxy_improvement
 
-        # Evaluate when there are missing values and all missing values goes
-        # to the right node and non-missing values goes to the left node.
-        if has_missing:
-            n_left, n_right = end - start - n_missing, n_missing
-            p = end - n_missing
-            missing_go_to_left = 0
+                    # sprintf(buffer, "%d",current_split.feature)
+                    # printf("current_feature:%s\n", buffer)
 
-            if not (n_left < min_samples_leaf or n_right < min_samples_leaf):
+                    copy_splitrecord(&current_split, &best_split)
+
+                    # sprintf(buffer, "%d",best_split.feature)
+                    # printf("best_feature:%s\n", buffer)                        
+
+
+            # Evaluate when there are missing values and all missing values goes
+            # to the right node and non-missing values goes to the left node.
+            if has_missing:
+                n_left, n_right = end - start - n_missing, n_missing
+                p = end - n_missing
+                missing_go_to_left = 0
+
+                if not (n_left < min_samples_leaf or n_right < min_samples_leaf):
+                    criterion.missing_go_to_left = missing_go_to_left
+                    criterion.update(p)
+
+                    if not ((criterion.weighted_n_left < min_weight_leaf) or
+                            (criterion.weighted_n_right < min_weight_leaf)):
+                        current_proxy_improvement = criterion.proxy_impurity_improvement()
+
+                        if current_proxy_improvement > best_proxy_improvement:
+                            best_proxy_improvement = current_proxy_improvement
+                            current_split.threshold = INFINITY
+                            current_split.missing_go_to_left = missing_go_to_left
+                            current_split.n_missing = n_missing
+                            current_split.pos = p
+
+                            current_split.improvement = best_proxy_improvement
+
+                            copy_splitrecord(&current_split, &best_split)
+
+            # if current_proxy_improvement < 0:
+            #     continue
+
+            num_nodes_valid += 1
+
+            # sprintf(buffer, "%d",ind)
+            # printf("node_id: %s\n", buffer)   
+
+            #### Cost Calculation
+            current_cost = 0.0
+
+            sensor_f = sensor_types[best_split.feature]
+            depth_f = depth_types[best_split.feature]
+            time_f = time_types[best_split.feature]
+
+            time_flag = False
+            depth_flag = False
+            sensor_flag = False
+            best_flag = False
+
+            for node_id_temp in range(node_count):
+                node = &nodes[node_id_temp]
+                feature = node.feature
+
+                if (feature == _TREE_LEAF) or (feature == _TREE_UNDEFINED):
+                    continue
+
+                sensor_n = sensor_types[feature]
+                depth_n = depth_types[feature]
+                time_n = time_types[feature]
+
+                # turning the flags off favors sensors of the same kind and type
+                if (best_split.feature == feature) and not best_flag:
+                    current_cost += sensor_cost[sensor_f] \
+                        + time_cost + depth_cost
+                    # best_flag = True
+
+                else:
+                    if (sensor_f == sensor_n) and not sensor_flag:
+                        # sensor_flag = True
+                        current_cost += sensor_cost[sensor_f]
+
+                    if (depth_f == depth_n) and (sensor_f == sensor_n) and not depth_flag:
+                        # depth_flag = True
+                        current_cost += depth_cost
+
+            best_split.cost = current_cost
+
+            # # Reorganize into samples[start:best_split.pos] + samples[best_split.pos:end]
+            # if best_split.pos < end:
+            #     partitioner.partition_samples_final(
+            #         best_split.pos,
+            #         best_split.threshold,
+            #         best_split.feature,
+            #         best_split.n_missing
+            #     )
+            #     criterion.init_missing(best_split.n_missing)
+            #     criterion.missing_go_to_left = best_split.missing_go_to_left
+
+            #     criterion.reset()
+            #     criterion.update(best_split.pos)
+            #     criterion.children_impurity(
+            #         &best_split.impurity_left, &best_split.impurity_right
+            #     )
+
+            #     node_improvement = criterion.impurity_improvement(
+            #         impurity,
+            #         best_split.impurity_left,
+            #         best_split.impurity_right
+            #     )                        
+
+            # best_split.improvement = node_improvement            
+
+            ind = num_nodes_valid - 1
+
+            obj_arr_temp[ind][0] = <float>best_split.improvement
+            obj_arr_temp[ind][1] = <float>best_split.cost
+            obj_arr_temp[ind][2] = <float>ind
+
+            # sprintf(buffer, "%d",best_split.feature)
+            # printf("feature:%s\n", buffer)
+            # sprintf(buffer, "%d",best_split.pos)
+            # printf("pos:%s\n", buffer)            
+
+            _add_to_split_list(best_split,split_list1)
+
+            # printf("node_iter", buffer)              
+
+        if num_nodes_valid > 0:
+            # continue
+
+            obj_arr.resize(num_nodes_valid)
+            for i in range(num_nodes_valid):
+                obj_arr[i].resize(num_vars)
+
+            for i in range(num_nodes_valid):
+                for j in range(num_vars):
+                    obj_arr[i][j] = obj_arr_temp[i][j]
+
+            # printf("cost calc\n", buffer)
+
+            ### Cost Objective Function
+            inplace_sort_2d_array_by_two_columns(obj_arr, 1, 0)
+
+            max_cost_ind = find_max_in_2d_array(obj_arr,1)
+            min_cost_ind = find_min_in_2d_array(obj_arr,1)
+            max_imp_ind = find_max_in_2d_array(obj_arr,0)
+            min_imp_ind = find_min_in_2d_array(obj_arr,0)
+            best_ind = max_imp_ind
+
+            cost_range = (obj_arr[max_cost_ind][1] - obj_arr[min_cost_ind][1])
+            imp_range = (obj_arr[max_imp_ind][0] - obj_arr[min_imp_ind][0])
+
+            # printf('tree_efficient_cost_flag\n')
+
+            for i in range(num_nodes_valid):
+            
+                if cost_range == 0:
+                    cost_var = 0.0
+                else:
+                    cost_var = (cost_threshold) * ((obj_arr[i][1] - obj_arr[min_cost_ind][1]) / \
+                       cost_range)
+
+                if imp_range == 0:
+                    imp_var = 0.0
+                else:
+                    imp_var = (1.0 - cost_threshold) * ((obj_arr[i][0] - obj_arr[min_imp_ind][0]) / \
+                       imp_range)
+
+                obj_arr[i][3] = cost_var + imp_var
+
+
+                # sprintf(buffer, '%f', obj_arr[i][3])
+                # printf('obj_val:%s\n', buffer)
+                
+            # inplace_sort_2d_array_by_one_column(obj_arr, 3)
+            inplace_sort_2d_array_by_two_columns(obj_arr,3, 0)
+            max_imp_ind = find_max_in_2d_array(obj_arr,0)
+
+            best_ind = 0
+            if obj_arr[best_ind][3] == 0:
+                best_ind = max_imp_ind
+
+            # sprintf(buffer, '%d', best_ind)
+            # printf('best_ind:%s\n', buffer)
+
+            # sprintf(buffer, '%f', obj_arr[best_ind][3])
+            # printf('obj_val:%s\n', buffer)
+
+
+            # for i in range(num_nodes_valid):
+            #     ind = num_nodes_valid - i - 1
+            #     if obj_arr[ind][3] == 0:
+            #         best_ind = min_imp_ind
+
+            best_cost_flag = False
+
+            # sq_sum_impurity = obj_arr[max_ind,0]
+            # sq_sum_impurity = criterion.sq_sum_total / criterion.weighted_n_node_samples
+            sq_sum_impurity = criterion.sq_sum / criterion.weighted_n_node_samples
+
+            if False:
+                
+
+                for node_id in range(num_nodes_valid):
+
+                    feature_ind = <int>obj_arr[node_id][2]
+                    current_split = split_list1[feature_ind]
+                    feature = current_split.feature
+
+                    if (feature == _TREE_LEAF) or (feature == _TREE_UNDEFINED):
+                        continue
+
+                    # node_improvement = current_split.improvement
+                    # diff = node_improvement / sq_sum_impurity
+
+                    diff = fabs(current_split.improvement - obj_arr[min_ind][0]) / \
+                        (obj_arr[max_ind][0] - obj_arr[min_ind][0])
+
+                    if (obj_arr[max_ind][0] - obj_arr[min_ind][0]) == 0:
+                        diff = 0.0
+
+                    if diff >= cost_threshold:
+                        best_ind = node_id
+                        best_cost_flag = False
+                        break
+
+            feature_ind = <int>obj_arr[best_ind][2]
+            best_split = split_list1[feature_ind]
+
+            if False:
+                sprintf(buffer, "%d",node_id)
+                printf("node_id: %s\n", buffer)    
+                sprintf(buffer, "%f",sq_sum_impurity)
+                printf("sq_sum_impurity: %s\n", buffer)
+                sprintf(buffer, "%f",diff)
+                printf("diff: %s\n", buffer)
+
+                for c_ind in range(3):
+                    if c_ind < 2:
+                        sprintf(buffer, "%f",obj_arr[max_ind][c_ind])
+                        printf("%s\n", buffer)
+                    if c_ind == 2:
+                        feature_ind = <int>obj_arr[max_ind][c_ind]
+                        current_split = split_list1[feature_ind]
+                        # sprintf(buffer, "%d",current_split.feature)
+                        sprintf(buffer, "%d",max_ind)
+                        printf("%s\n", buffer)
+
+                for c_ind in range(3):
+                    if c_ind < 2:
+                        sprintf(buffer, "%f",obj_arr[best_ind][c_ind])
+                        printf("%s\n", buffer)
+                    if c_ind == 2:
+                        feature_ind = <int>obj_arr[best_ind][c_ind]
+                        current_split = split_list1[feature_ind]
+                        # sprintf(buffer, "%d",current_split.feature)
+                        sprintf(buffer, "%d",best_ind)
+                        printf("%s\n", buffer)
+
+                min_ind = find_min_in_2d_array(obj_arr,0)
+                sprintf(buffer, "%f",obj_arr[min_ind][0])
+                sprintf(buffer2, "%f",obj_arr[min_ind][1])
+                # feature_ind = <int>obj_arr[min_ind][2]
+                # current_split = split_list1[feature_ind]
+                # sprintf(buffer3, "%d",current_split.feature)
+                sprintf(buffer3, "%d",min_ind)
+                printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+                
+                max_ind = find_max_in_2d_array(obj_arr,0)
+                sprintf(buffer, "%f",obj_arr[max_ind][0])
+                sprintf(buffer2, "%f",obj_arr[max_ind][1])        
+                sprintf(buffer3, "%d",max_ind)
+                printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+
+                sprintf(buffer, "%f",obj_arr[max_ind][0] - obj_arr[min_ind][0])
+                printf("imp range:%s\n", buffer)
+
+                # min_ind = find_min_in_2d_array(obj_arr,1)
+                min_ind = <int>(obj_arr.size() - 1)
+                sprintf(buffer, "%f",obj_arr[min_ind][0])
+                sprintf(buffer2, "%f",obj_arr[min_ind][1])
+                sprintf(buffer3, "%d",min_ind)
+                printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+                
+                # max_ind = find_max_in_2d_array(obj_arr,1)
+                max_ind = 0
+                sprintf(buffer, "%f",obj_arr[max_ind][0])
+                sprintf(buffer2, "%f",obj_arr[max_ind][1])
+                sprintf(buffer3, "%d",max_ind)
+                printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+                printf("\n")
+
+                sprintf(buffer, "%d",best_split.feature)
+                printf("feature:%s\n", buffer)
+                sprintf(buffer, "%d",best_split.pos)
+                printf("pos:%s\n", buffer)
+                sprintf(buffer, "%d",best_split.n_missing)
+                printf("n_missing:%s\n", buffer)
+                sprintf(buffer, "%f",best_split.improvement)
+                printf("improvement:%s\n", buffer)
+                sprintf(buffer, "%f",best_split.threshold)
+                printf("threshold:%s\n", buffer)
+                sprintf(buffer, "%f",best_split.cost)
+                printf("cost:%s\n", buffer)
+                sprintf(buffer, "%f",best_split.impurity_left)
+                printf("impurity_left:%s\n", buffer)
+                sprintf(buffer, "%f",best_split.impurity_right)
+                printf("impurity_right:%s\n", buffer)
+
+    if not best_cost_flag:
+        # if (node_count == 0):
+        #     best_cost_flag = True
+        # sprintf(buffer,'%f',sq_sum_impurity)
+        # printf('impurity:%s\n', buffer)
+        # sprintf(buffer,'%f',best_split.improvement)
+        # printf('improvement:%s\n', buffer)
+        # sprintf(buffer,'%f',imp_threshold)
+        # printf('imp_threshold:%s\n', buffer)        
+        if (best_split.improvement / sq_sum_impurity) < imp_threshold:
+            best_cost_flag = True
+
+    if best_cost_flag:
+        # printf("best_cost_flag = True\n")
+        num_nodes_valid = 0
+        current_proxy_improvement = -INFINITY
+        best_proxy_improvement = -INFINITY
+        partitioner.init_node_split(start, end)
+        _init_split(&best_split, end)
+        copy_splitrecord(&best_split, &current_split)
+        criterion.reset()
+
+        set_2d_array_to_zero(obj_arr)
+        set_2d_array_to_zero(obj_arr_temp) 
+
+        obj_arr_temp.resize(n_features)
+        for i in range(n_features):
+            obj_arr_temp[i].resize(num_vars)
+
+        # printf('initialized\n')   
+
+        # Sample up to max_features without replacement using a
+        # Fisher-Yates-based algorithm (using the local variables `f_i` and
+        # `f_j` to compute a permutation of the `features` array).
+        #
+        # Skip the CPU intensive evaluation of the impurity criterion for
+        # features that were already detected as constant (hence not suitable
+        # for good splitting) by ancestor nodes and save the information on
+        # newly discovered constant features to spare computation on descendant
+        # nodes.
+        while (f_i > n_total_constants and  # Stop early if remaining features
+                                            # are constant
+                (n_visited_features < max_features or
+                 # At least one drawn features must be non constant
+                 n_visited_features <= n_found_constants + n_drawn_constants)):
+
+            n_visited_features += 1
+
+            best_proxy_improvement = -INFINITY
+
+            # Loop invariant: elements of features in
+            # - [:n_drawn_constant[ holds drawn and known constant features;
+            # - [n_drawn_constant:n_known_constant[ holds known constant
+            #   features that haven't been drawn yet;
+            # - [n_known_constant:n_total_constant[ holds newly found constant
+            #   features;
+            # - [n_total_constant:f_i[ holds features that haven't been drawn
+            #   yet and aren't constant apriori.
+            # - [f_i:n_features[ holds features that have been drawn
+            #   and aren't constant.
+
+            # Draw a feature at random
+            f_j = rand_int(n_drawn_constants, f_i - n_found_constants,
+                           random_state)
+
+            if f_j < n_known_constants:
+                # f_j in the interval [n_drawn_constants, n_known_constants[
+                features[n_drawn_constants], features[f_j] = features[f_j], features[n_drawn_constants]
+
+                n_drawn_constants += 1
+                continue
+
+            # f_j in the interval [n_known_constants, f_i - n_found_constants[
+            f_j += n_found_constants
+            # f_j in the interval [n_total_constants, f_i[
+            current_split.feature = features[f_j]
+            
+            # sprintf(buffer, "%d",current_split.feature)
+            # printf("feature:%s\n", buffer)
+
+            partitioner.sort_samples_and_feature_values(current_split.feature)
+            n_missing = partitioner.n_missing
+            end_non_missing = end - n_missing
+
+            if (
+                # All values for this feature are missing, or
+                end_non_missing == start or
+                # This feature is considered constant (max - min <= FEATURE_THRESHOLD)
+                feature_values[end_non_missing - 1] <= feature_values[start] + FEATURE_THRESHOLD
+            ):
+                # We consider this feature constant in this case.
+                # Since finding a split among constant feature is not valuable,
+                # we do not consider this feature for splitting.
+                features[f_j], features[n_total_constants] = features[n_total_constants], features[f_j]
+
+                n_found_constants += 1
+                n_total_constants += 1
+                continue
+
+            f_i -= 1
+            features[f_i], features[f_j] = features[f_j], features[f_i]
+            has_missing = n_missing != 0
+            criterion.init_missing(n_missing)  # initialize even when n_missing == 0
+
+            # Evaluate all splits
+
+            # If there are missing values, then we search twice for the most optimal split.
+            # The first search will have all the missing values going to the right node.
+            # The second search will have all the missing values going to the left node.
+            # If there are no missing values, then we search only once for the most
+            # optimal split.
+            n_searches = 2 if has_missing else 1
+
+            for i in range(n_searches):
+                missing_go_to_left = i == 1
                 criterion.missing_go_to_left = missing_go_to_left
-                criterion.update(p)
+                criterion.reset()
 
-                if not ((criterion.weighted_n_left < min_weight_leaf) or
-                        (criterion.weighted_n_right < min_weight_leaf)):
+                p = start
+
+                while p < end_non_missing:
+                    partitioner.next_p(&p_prev, &p)
+
+                    if p >= end_non_missing:
+                        continue
+
+                    if missing_go_to_left:
+                        n_left = p - start + n_missing
+                        n_right = end_non_missing - p
+                    else:
+                        n_left = p - start
+                        n_right = end_non_missing - p + n_missing
+
+                    # Reject if min_samples_leaf is not guaranteed
+                    if n_left < min_samples_leaf or n_right < min_samples_leaf:
+                        continue
+
+                    current_split.pos = p
+                    criterion.update(current_split.pos)
+
+                    # Reject if monotonicity constraints are not satisfied
+                    if (
+                        with_monotonic_cst and
+                        monotonic_cst[current_split.feature] != 0 and
+                        not criterion.check_monotonicity(
+                            monotonic_cst[current_split.feature],
+                            lower_bound,
+                            upper_bound,
+                        )
+                    ):
+                        continue
+
+                    # Reject if min_weight_leaf is not satisfied
+                    if ((criterion.weighted_n_left < min_weight_leaf) or
+                            (criterion.weighted_n_right < min_weight_leaf)):
+                        continue
+
                     current_proxy_improvement = criterion.proxy_impurity_improvement()
 
                     if current_proxy_improvement > best_proxy_improvement:
                         best_proxy_improvement = current_proxy_improvement
-                        current_split.threshold = INFINITY
-                        current_split.missing_go_to_left = missing_go_to_left
-                        current_split.n_missing = n_missing
-                        current_split.pos = p
-                        best_split = current_split
+                        # sum of halves is used to avoid infinite value
+                        current_split.threshold = (
+                            feature_values[p_prev] / 2.0 + feature_values[p] / 2.0
+                        )
 
+                        if (
+                            current_split.threshold == feature_values[p] or
+                            current_split.threshold == INFINITY or
+                            current_split.threshold == -INFINITY
+                        ):
+                            current_split.threshold = feature_values[p_prev]
+
+                        current_split.n_missing = n_missing
+                        if n_missing == 0:
+                            current_split.missing_go_to_left = n_left > n_right
+                        else:
+                            current_split.missing_go_to_left = missing_go_to_left
+
+                        current_split.improvement = best_proxy_improvement
+
+
+                        # sprintf(buffer, "%d",current_split.feature)
+                        # printf("current_feature:%s\n", buffer)
+                        # sprintf(buffer, "%f",current_proxy_improvement)
+                        # printf("current_proxy:%s\n", buffer)
+                        # sprintf(buffer, "%f",best_proxy_improvement)
+                        # printf("best_proxy:%s\n", buffer)                        
+
+                        # sprintf(buffer, "%d",current_split.feature)
+                        # printf("current_feature:%s\n", buffer)
+
+                        copy_splitrecord(&current_split, &best_split)
+
+                        # sprintf(buffer, "%d",best_split.feature)
+                        # printf("best_feature:%s\n", buffer)                        
+
+            # Evaluate when there are missing values and all missing values goes
+            # to the right node and non-missing values goes to the left node.
+            if has_missing:
+                n_left, n_right = end - start - n_missing, n_missing
+                p = end - n_missing
+                missing_go_to_left = 0
+
+                if not (n_left < min_samples_leaf or n_right < min_samples_leaf):
+                    criterion.missing_go_to_left = missing_go_to_left
+                    criterion.update(p)
+
+                    if not ((criterion.weighted_n_left < min_weight_leaf) or
+                            (criterion.weighted_n_right < min_weight_leaf)):
+                        current_proxy_improvement = criterion.proxy_impurity_improvement()
+
+                        if current_proxy_improvement > best_proxy_improvement:
+                            best_proxy_improvement = current_proxy_improvement
+                            current_split.threshold = INFINITY
+                            current_split.missing_go_to_left = missing_go_to_left
+                            current_split.n_missing = n_missing
+                            current_split.pos = p
+
+                            current_split.improvement = best_proxy_improvement
+
+                            copy_splitrecord(&current_split, &best_split)
+
+            # if best_split.improvement < 0:
+            #     continue
+
+            num_nodes_valid += 1
+
+            #### Cost Calculation
+            current_cost = 0.0
+
+            sensor_f = sensor_types[best_split.feature]
+            depth_f = depth_types[best_split.feature]
+            time_f = time_types[best_split.feature]
+
+            time_flag = False
+            depth_flag = False
+            sensor_flag = False
+            best_flag = False
+
+            for node_id in range(node_count):
+                node = &nodes[node_id]
+                feature = node.feature
+
+                # sprintf(buffer, "%d",node_id)
+                # sprintf(buffer2, "%d",feature)
+                # printf("%s,%s\n", buffer, buffer2)
+
+                if (feature == _TREE_LEAF) or (feature == _TREE_UNDEFINED):
+                    continue
+
+                sensor_n = sensor_types[feature]
+                depth_n = depth_types[feature]
+                time_n = time_types[feature]
+
+                # turning the flags off favors sensors of the same kind and type
+                if (best_split.feature == feature) and not best_flag:
+                    current_cost += sensor_cost[sensor_f] \
+                        + time_cost + depth_cost
+                    # best_flag = True
+
+                else:
+                    if (sensor_f == sensor_n) and not sensor_flag:
+                        # sensor_flag = True
+                        current_cost += sensor_cost[sensor_f]
+
+                    if (depth_f == depth_n) and (sensor_f == sensor_n) and not depth_flag:
+                        # depth_flag = True
+                        current_cost += depth_cost
+
+            best_split.cost = current_cost
+
+            # ind = <int>(n_visited_features - 1)
+            ind = num_nodes_valid - 1
+
+            # sprintf(buffer, "%d",ind)
+            # printf("ind: %s\n", buffer)
+            # sprintf(buffer, "%d",n_features)
+            # printf("n_features: %s\n", buffer)
+
+            # sprintf(buffer, "%f",best_split.improvement)
+            # printf("imp: %s\n", buffer)
+
+            # sprintf(buffer, "%f",current_cost)
+            # printf("cost: %s\n", buffer)
+
+            obj_arr_temp[ind][0] = <float>best_split.improvement
+            obj_arr_temp[ind][1] = <float>best_split.cost
+            obj_arr_temp[ind][2] = <float>ind
+
+            _add_to_split_list(best_split,split_list2)
+
+            # sprintf(buffer, "%d",best_split.feature)
+            # printf("feature:%s\n", buffer)
+            # sprintf(buffer, "%d",best_split.pos)
+            # printf("pos:%s\n", buffer)                 
+
+        # sprintf(buffer, "%d",num_nodes_valid)
+        # printf("num_nodes_valid: %s\n", buffer)
+
+        if num_nodes_valid > 0:
+            # continue
+
+            obj_arr.resize(num_nodes_valid)
+            for i in range(num_nodes_valid):
+                obj_arr[i].resize(num_vars)
+
+            for i in range(num_nodes_valid):
+                for j in range(num_vars):
+                    obj_arr[i][j] = obj_arr_temp[i][j]
+
+            ### Cost Objective Function
+            inplace_sort_2d_array_by_two_columns(obj_arr, 1, 0)
+
+            # max_ind = find_max_in_2d_array(obj_arr,0)
+            # min_ind = find_min_in_2d_array(obj_arr,0)
+            # best_ind = max_ind
+            n_ind = -1
+
+            max_cost_ind = find_max_in_2d_array(obj_arr,1)
+            min_cost_ind = find_min_in_2d_array(obj_arr,1)
+            max_imp_ind = find_max_in_2d_array(obj_arr,0)
+            min_imp_ind = find_min_in_2d_array(obj_arr,0)
+            best_ind = max_imp_ind
+
+            cost_range = (obj_arr[max_cost_ind][1] - obj_arr[min_cost_ind][1])
+            imp_range = (obj_arr[max_imp_ind][0] - obj_arr[min_imp_ind][0])
+
+            # printf('best_cost_flag\n')
+
+            for i in range(num_nodes_valid):
+            
+                if cost_range == 0:
+                    cost_var = 0.0
+                else:
+                    cost_var = (cost_threshold) * ((obj_arr[i][1] - obj_arr[min_cost_ind][1]) / \
+                       cost_range)
+                
+                if imp_range == 0:
+                    imp_var = 0.0
+                else:
+                    imp_var = (1.0 - cost_threshold) * ((obj_arr[i][0] - obj_arr[min_imp_ind][0]) / \
+                       imp_range)
+
+                obj_arr[i][3] = cost_var + imp_var
+
+
+                # sprintf(buffer, '%f', obj_arr[i][3])
+                # printf('obj_val:%s\n', buffer)
+                
+
+            # inplace_sort_2d_array_by_one_column(obj_arr, 3)
+            inplace_sort_2d_array_by_two_columns(obj_arr, 3, 0)
+            max_imp_ind = find_max_in_2d_array(obj_arr,0)
+
+            best_ind = 0
+            if obj_arr[best_ind][3] == 0:
+                best_ind = max_imp_ind
+
+            # sprintf(buffer, '%d', best_ind)
+            # printf('best_ind:%s\n', buffer)
+
+            # sprintf(buffer, '%f', obj_arr[best_ind][3])
+            # printf('obj_val:%s\n', buffer)
+
+            if False:
+                # printf("best_cost")
+                # sprintf(buffer, "%d",max_ind)
+                # printf("max_ind: %s\n", buffer)
+
+                # sprintf(buffer, "%d",n_features)
+                # printf("n_feat: %s\n", buffer)
+
+                # while n_ind < <int>n_features - 1:
+                while n_ind < num_nodes_valid - 1:            
+                    n_ind += 1
+
+                    # if (feature == _TREE_LEAF) or (feature == _TREE_UNDEFINED):
+                    #     continue
+
+                    # diff = fabs(obj_arr[max_ind][0] - obj_arr[n_ind][0]) / \
+                    #     (obj_arr[max_ind][0] - obj_arr[min_ind][0])
+
+                    diff = fabs(obj_arr[n_ind][0] - obj_arr[min_ind][0]) / \
+                        (obj_arr[max_ind][0] - obj_arr[min_ind][0])
+
+
+                    if (obj_arr[max_ind][0] - obj_arr[min_ind][0]) == 0:
+                        diff = 0.0                
+
+                    # sprintf(buffer, "%f",obj_arr[n_ind][0])
+                    # printf("imp: %s\n", buffer)
+                    # # fflush(stdout)
+
+                    # sprintf(buffer, "%f",diff)
+                    # printf("diff: %s\n", buffer)
+                    # # fflush(stdout)
+
+                    # sprintf(buffer, "%f",cost_threshold)
+                    # printf("cost_threshold: %s\n", buffer)
+                    # # fflush(stdout)
+
+                    if diff >= cost_threshold:
+                        best_ind = n_ind
+                        break
+
+            feature_ind = <int>obj_arr[best_ind][2]
+            best_split = split_list2[feature_ind]
+
+            # sprintf(buffer, "%d",n_ind)
+            # printf("n_ind: %s\n", buffer)    
+
+            # best_split.cost = obj_arr[best_ind][1]
+
+            # for r_ind in [best_ind, max_ind]:
+            if False:
+                for c_ind in range(3):
+                    if c_ind < 2:
+                        sprintf(buffer, "%f",obj_arr[max_ind][c_ind])
+                        printf("%s\n", buffer)
+                    if c_ind == 2:
+                        feature_ind = <int>obj_arr[max_ind][c_ind]
+                        current_split = split_list2[feature_ind]
+                        # sprintf(buffer, "%d",current_split.feature)
+                        sprintf(buffer, "%d",max_ind)
+                        printf("%s\n", buffer)
+
+                for c_ind in range(3):
+                    if c_ind < 2:
+                        sprintf(buffer, "%f",obj_arr[best_ind][c_ind])
+                        printf("%s\n", buffer)
+                    if c_ind == 2:
+                        feature_ind = <int>obj_arr[best_ind][c_ind]
+                        current_split = split_list2[feature_ind]
+                        # sprintf(buffer, "%d",current_split.feature)
+                        sprintf(buffer, "%d",best_ind)
+                        printf("%s\n", buffer)
+
+                # for i in range(2):
+            if False:
+                min_ind = find_min_in_2d_array(obj_arr,0)
+                sprintf(buffer, "%f",obj_arr[min_ind][0])
+                sprintf(buffer2, "%f",obj_arr[min_ind][1])
+                # feature_ind = <int>obj_arr[min_ind][2]
+                # current_split = split_list2[feature_ind]
+                # sprintf(buffer3, "%d",current_split.feature)
+                sprintf(buffer3, "%d",min_ind)
+                printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+                
+                max_ind = find_max_in_2d_array(obj_arr,0)
+                sprintf(buffer, "%f",obj_arr[max_ind][0])
+                sprintf(buffer2, "%f",obj_arr[max_ind][1])        
+                sprintf(buffer3, "%d",max_ind)
+                printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+
+                sprintf(buffer, "%f",obj_arr[max_ind][0] - obj_arr[min_ind][0])
+                printf("imp range:%s\n", buffer)
+
+                # min_ind = find_min_in_2d_array(obj_arr,1)
+                min_ind = <int>(obj_arr.size() - 1)
+                sprintf(buffer, "%f",obj_arr[min_ind][0])
+                sprintf(buffer2, "%f",obj_arr[min_ind][1])
+                sprintf(buffer3, "%d",min_ind)
+                printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+                
+                # max_ind = find_max_in_2d_array(obj_arr,1)
+                max_ind = 0
+                sprintf(buffer, "%f",obj_arr[max_ind][0])
+                sprintf(buffer2, "%f",obj_arr[max_ind][1])
+                sprintf(buffer3, "%d",max_ind)
+                printf("%s,%s,%s\n", buffer, buffer2, buffer3)
+                printf("\n") 
+
+            if False:
+                sprintf(buffer, "%d",best_split.feature)
+                printf("feature:%s\n", buffer)
+                sprintf(buffer, "%d",best_split.pos)
+                printf("pos:%s\n", buffer)
+                sprintf(buffer, "%f",best_split.improvement)
+                printf("improvement:%s\n", buffer)
+                sprintf(buffer, "%f",best_split.threshold)
+                printf("threshold:%s\n", buffer)
+                sprintf(buffer, "%f",best_split.cost)
+                printf("cost:%s\n", buffer)
+                # sprintf(buffer, "%f",best_split.impurity_left)
+                # printf("impurity_left:%s\n", buffer)
+                # sprintf(buffer, "%f",best_split.impurity_right)
+                # printf("impurity_right:%s\n", buffer)
+                # sprintf(buffer, "%d",best_split.n_missing)
+                # printf("n_missing:%s\n", buffer)            
+   
     # Reorganize into samples[start:best_split.pos] + samples[best_split.pos:end]
     if best_split.pos < end:
         partitioner.partition_samples_final(
@@ -1522,7 +2496,11 @@ cdef class BestSplitter(Splitter):
             SplitRecord* split,
             intp_t* n_constant_features,
             float64_t lower_bound,
-            float64_t upper_bound
+            float64_t upper_bound,
+            Tree tree,
+            int32_t[:] sensor_types,
+            int32_t[:] depth_types,
+            int32_t[:] time_types            
     ) except -1 nogil:
         return node_split_best(
             self,
@@ -1534,7 +2512,11 @@ cdef class BestSplitter(Splitter):
             self.with_monotonic_cst,
             self.monotonic_cst,
             lower_bound,
-            upper_bound
+            upper_bound,
+            tree,
+            sensor_types,
+            depth_types,
+            time_types,            
         )
 
 cdef class BestSparseSplitter(Splitter):
@@ -1558,7 +2540,11 @@ cdef class BestSparseSplitter(Splitter):
             SplitRecord* split,
             intp_t* n_constant_features,
             float64_t lower_bound,
-            float64_t upper_bound
+            float64_t upper_bound,
+            Tree tree,
+            int32_t[:] sensor_types,
+            int32_t[:] depth_types,
+            int32_t[:] time_types            
     ) except -1 nogil:
         return node_split_best(
             self,
@@ -1570,7 +2556,11 @@ cdef class BestSparseSplitter(Splitter):
             self.with_monotonic_cst,
             self.monotonic_cst,
             lower_bound,
-            upper_bound
+            upper_bound,
+            tree,
+            sensor_types,
+            depth_types,
+            time_types,
         )
 
 cdef class RandomSplitter(Splitter):
@@ -1594,7 +2584,11 @@ cdef class RandomSplitter(Splitter):
             SplitRecord* split,
             intp_t* n_constant_features,
             float64_t lower_bound,
-            float64_t upper_bound
+            float64_t upper_bound,
+            Tree tree,
+            int32_t[:] sensor_types,
+            int32_t[:] depth_types,
+            int32_t[:] time_types            
     ) except -1 nogil:
         return node_split_random(
             self,
@@ -1629,7 +2623,11 @@ cdef class RandomSparseSplitter(Splitter):
             SplitRecord* split,
             intp_t* n_constant_features,
             float64_t lower_bound,
-            float64_t upper_bound
+            float64_t upper_bound,
+            Tree tree,
+            int32_t[:] sensor_types,
+            int32_t[:] depth_types,
+            int32_t[:] time_types            
     ) except -1 nogil:
         return node_split_random(
             self,
